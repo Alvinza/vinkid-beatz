@@ -15,7 +15,7 @@ function Cart() {
             <div key={beat._id} className="cart-item">
               <img
                 className="cart-item-image"
-                src={`http://localhost:5000${beat.picture}`}
+                src={`https://vinkid-beatz-backend.onrender.com${beat.picture}`}
                 alt={beat.title}
               />
               <div className="cart-item-details">
