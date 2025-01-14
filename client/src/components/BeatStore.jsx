@@ -49,8 +49,8 @@ function BeatStore() {
     const fetchBeats = async () => {
       try {
         const response = selectedGenre
-          ? await axios.get(`http://localhost:5000/api/beats/genre/${selectedGenre}`)
-          : await axios.get("http://localhost:5000/api/beats");
+          ? await axios.get(`https://vinkid-beatz-backend.onrender.com/api/beats/genre/${selectedGenre}`)
+          : await axios.get("https://vinkid-beatz-backend.onrender.com/api/beats");
         setBeats(response.data);
         setFilteredBeats(response.data);
       } catch (err) {
@@ -92,7 +92,7 @@ function BeatStore() {
 
   useEffect(() => {
     if (audioRef.current && playingBeat) {
-      const newBeatSrc = `http://localhost:5000${playingBeat.audio}`;
+      const newBeatSrc = `https://vinkid-beatz-backend.onrender.com${playingBeat.audio}`;
 
       if (newBeatSrc !== currentBeatSrc) {
         audioRef.current.src = newBeatSrc;
@@ -204,7 +204,7 @@ function BeatStore() {
 
                 <img
                   className="beat-image"
-                  src={`http://localhost:5000${beat.picture}`}
+                  src={`https://vinkid-beatz-backend.onrender.com${beat.picture}`}
                   alt={beat.title}
                 />
                 <div className="beat-details">
@@ -242,7 +242,7 @@ function BeatStore() {
                 <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-1/3">
                   <img
                     className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover"
-                    src={`http://localhost:5000${playingBeat.picture}`}
+                    src={`https://vinkid-beatz-backend.onrender.com${playingBeat.picture}`}
                     alt={playingBeat.title}
                   />
                   <div className="player-info">
