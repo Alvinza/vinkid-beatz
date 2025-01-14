@@ -22,6 +22,7 @@ import CartPage from './components/CartPage';
 import Success from './components/Success';
 import NotFound from './components/NotFound';
 import AdminPanel from './components/AdminPanel';
+import AdminLogin from './components/AdminLogin'; 
 
 
 
@@ -45,6 +46,7 @@ function App() {
                 <Route path="/faq" element={<Faq />} />
                 <Route path="/success" element={<Success />} />
                 <Route path="*" element={<NotFound />} />
+                <Route path="/admin-login" element={<AdminLogin />} />
                 <Route
                   path="/admin-panel"
                   element={
