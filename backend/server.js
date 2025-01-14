@@ -167,51 +167,35 @@ app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   
   try {
-    console.log('Login attempt for:', email);
+    console.log('Login attempt:', { email, passwordLength: password?.length });
     
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email });
     
-    console.log('User lookup result:', {
-      userFound: !!user,
-      email: user?.email,
-      isAdmin: user?.isAdmin,
-      hasPassword: !!user?.password,
-      passwordLength: user?.password?.length
-    });
-
     if (!user) {
-      return res.status(401).json({ message: "User not found" });
+      console.log('User not found:', email);
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password comparison result:', {
-      passwordMatch: isMatch,
-      providedPasswordLength: password?.length,
-      hashedPasswordLength: user.password?.length
+    console.log('User found:', {
+      email: user.email,
+      isAdmin: user.isAdmin,
+      hasPassword: !!user.password,
+      passwordLength: user.password?.length
     });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    console.log('Password comparison:', { isMatch });
 
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    // Create token with admin status
+    // Generate token
     const token = jwt.sign(
-      { 
-        id: user._id, 
-        email: user.email, 
-        isAdmin: user.isAdmin 
-      },
+      { id: user._id, email: user.email, isAdmin: user.isAdmin },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-
-    // Log successful login
-    console.log('Login successful:', {
-      userId: user._id,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      tokenGenerated: !!token
-    });
 
     res.json({
       name: user.username,
@@ -222,7 +206,7 @@ app.post("/api/login", async (req, res) => {
 
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
