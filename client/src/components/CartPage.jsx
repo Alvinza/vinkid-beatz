@@ -35,7 +35,7 @@ function CartPage() {
               >
                 <div className="flex items-center space-x-4">
                   <img
-                    src={`http://localhost:5000${item.picture}`}
+                    src={`https://vinkid-beatz-backend.onrender.com${item.picture}`}
                     alt={item.title}
                     className="w-20 h-20 object-cover rounded"
                   />
