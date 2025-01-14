@@ -166,11 +166,12 @@ const Login = () => {
                   <Link to="/register" className="text-sm text-blue-600 hover:text-blue-500">
                     Don't have an account? Create one
                   </Link>
+                    <Link to="/admin-login">Admin Login</Link>
                 </div>
               </Form>
             )}
           </Formik>
-          <Link to="/admin-login">Admin Login</Link>
+        
         </div>
       </div>
     </div>
