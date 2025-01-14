@@ -7,41 +7,48 @@ async function verifyAndUpdateAdmin() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
-
-    // First, let's check if admin exists
-    let adminUser = await User.findOne({ email: 'vinkidbeatz@gmail.com' });
     
-    // Hash the password
+    const adminEmail = 'vinkidbeatz@gmail.com';
+    const adminPassword = '@vinkidbeatz2025!';
+    
+    // First verify if admin exists
+    let admin = await User.findOne({ email: adminEmail });
+    console.log('Existing admin found:', !!admin);
+    
+    // Hash the new password
     const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash('@vinkidbeatz2025!', salt);
-
-    if (adminUser) {
+    const hashedPassword = await bcrypt.hash(adminPassword, salt);
+    
+    if (admin) {
       // Update existing admin
-      adminUser.password = hashedPassword;
-      adminUser.isAdmin = true;
-      await adminUser.save();
-      console.log('Admin user updated:', adminUser.email);
+      admin.password = hashedPassword;
+      admin.isAdmin = true;
+      admin.username = 'Admin';
+      await admin.save();
+      console.log('Admin updated');
     } else {
       // Create new admin
-      adminUser = new User({
+      admin = new User({
         username: 'Admin',
-        email: 'vinkidbeatz@gmail.com',
+        email: adminEmail,
         password: hashedPassword,
         isAdmin: true
       });
-      await adminUser.save();
-      console.log('New admin user created:', adminUser.email);
+      await admin.save();
+      console.log('New admin created');
     }
-
-    // Verify the update
-    const verifiedAdmin = await User.findOne({ email: 'vinkidbeatz@gmail.com' });
+    
+    // Verify the admin account
+    const verifiedAdmin = await User.findOne({ email: adminEmail });
     console.log('Admin verification:', {
-      email: verifiedAdmin.email,
-      isAdmin: verifiedAdmin.isAdmin,
-      exists: !!verifiedAdmin
+      exists: !!verifiedAdmin,
+      email: verifiedAdmin?.email,
+      isAdmin: verifiedAdmin?.isAdmin,
+      hasPassword: !!verifiedAdmin?.password,
+      passwordLength: verifiedAdmin?.password?.length
     });
-
-    mongoose.disconnect();
+    
+    await mongoose.disconnect();
   } catch (error) {
     console.error('Error:', error);
   }
