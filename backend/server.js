@@ -24,6 +24,20 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Add this temporarily and remove after testing
+app.get("/api/check-admin", async (req, res) => {
+  try {
+    const admin = await User.findOne({ email: 'vinkidbeatz@gmail.com' });
+    res.json({
+      exists: !!admin,
+      isAdmin: admin?.isAdmin,
+      passwordLength: admin?.password?.length
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Enhanced CORS configuration
 app.use(cors({ 
   origin: [
