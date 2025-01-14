@@ -151,19 +151,30 @@ app.post('/api/register', async (req, res) => {
 // Enhanced login route
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
+  
   try {
     console.log('Login attempt for:', email);
     
+    if (!email || !password) {
+      return res.status(400).json({ 
+        message: "Email and password are required" 
+      });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
       console.log('User not found:', email);
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ 
+        message: "Invalid credentials" 
+      });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       console.log('Password mismatch for user:', email);
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ 
+        message: "Invalid credentials" 
+      });
     }
 
     const token = jwt.sign(
@@ -185,7 +196,10 @@ app.post("/api/login", async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: "Server error", details: error.message });
+    res.status(500).json({ 
+      message: "Server error", 
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined 
+    });
   }
 });
 
