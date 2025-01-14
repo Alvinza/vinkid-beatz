@@ -1,7 +1,6 @@
-// updateAdmin.js
 require('dotenv').config();
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const User = require('./models/User'); // Adjust path as needed
 
 async function updateAdminCredentials() {
@@ -9,10 +8,11 @@ async function updateAdminCredentials() {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
 
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const adminPassword = process.env.ADMIN_PASSWORD;
+    // Admin credentials from environment variables
+    const adminEmail = 'vinkidbeatz@gmail.com';
+    const adminPassword = '@vinkidbeatz2025!';
 
-    // Hash the new password
+    // Hash the password
     const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(adminPassword, salt);
 
@@ -31,6 +31,7 @@ async function updateAdminCredentials() {
     console.log('Admin credentials updated successfully');
     console.log('Admin email:', result.email);
     console.log('Admin username:', result.username);
+    console.log('IsAdmin:', result.isAdmin);
     
     mongoose.disconnect();
   } catch (error) {
