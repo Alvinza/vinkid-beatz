@@ -9,8 +9,8 @@ export const AudioProvider = ({ children }) => {
   const [currentBeat, setCurrentBeat] = useState(null);
 
   const playAudio = (beat, index) => {
-    if (audioRef.current.src !== `http://localhost:5000${beat.audio}`) {
-      audioRef.current.src = `http://localhost:5000${beat.audio}`;
+    if (audioRef.current.src !== `https://vinkid-beatz-backend.onrender.com${beat.audio}`) {
+      audioRef.current.src = `https://vinkid-beatz-backend.onrender.com${beat.audio}`;
       audioRef.current.load();
     }
 
