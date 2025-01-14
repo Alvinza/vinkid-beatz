@@ -170,6 +170,7 @@ const Login = () => {
               </Form>
             )}
           </Formik>
+          <Link to="/admin-login">Admin Login</Link>
         </div>
       </div>
     </div>
