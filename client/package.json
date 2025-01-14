@@ -36,7 +36,7 @@
   "scripts": {
     "server": "node server",
     "start": "react-scripts start",
-    "build": "npm install --prefix ./client && npm run build --prefix ./ client && npm install",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
