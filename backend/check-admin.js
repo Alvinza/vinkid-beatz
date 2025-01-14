@@ -3,46 +3,54 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 
-async function checkAdmin() {
+async function createOrUpdateAdmin() {
   try {
+    console.log('Connecting to MongoDB...');
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
 
-    // Find the admin user
-    const admin = await User.findOne({ email: 'vinkidbeatz@gmail.com' });
-    
-    if (!admin) {
-      console.log('Admin user does not exist!');
-      return;
-    }
+    const adminEmail = 'vinkidbeatz@gmail.com';
+    const adminPassword = '@vinkidbeatz2025!';
 
-    console.log('Admin user found:', {
-      email: admin.email,
-      username: admin.username,
-      isAdmin: admin.isAdmin,
-      hasPassword: !!admin.password,
-      passwordLength: admin.password?.length
+    // First, delete any existing admin user to start fresh
+    await User.deleteOne({ email: adminEmail });
+    console.log('Cleaned up any existing admin accounts');
+
+    // Create new admin user
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(adminPassword, salt);
+
+    const newAdmin = new User({
+      username: 'Admin',
+      email: adminEmail,
+      password: hashedPassword,
+      isAdmin: true
     });
 
-    // Test password match
-    const testPassword = '@vinkidbeatz2025!';
-    const isMatch = await bcrypt.compare(testPassword, admin.password);
-    console.log('Password match test:', isMatch);
+    await newAdmin.save();
+    console.log('New admin user created');
 
-    // If password doesn't match, update it
-    if (!isMatch) {
-      const salt = await bcrypt.genSalt(12);
-      const hashedPassword = await bcrypt.hash(testPassword, salt);
-      
-      admin.password = hashedPassword;
-      await admin.save();
-      
-      console.log('Admin password updated');
-      
-      // Verify the update
-      const newMatch = await bcrypt.compare(testPassword, admin.password);
-      console.log('New password match test:', newMatch);
+    // Verify the admin user
+    const verifiedAdmin = await User.findOne({ email: adminEmail });
+    const passwordMatch = await bcrypt.compare(adminPassword, verifiedAdmin.password);
+
+    console.log('Admin verification:', {
+      exists: !!verifiedAdmin,
+      email: verifiedAdmin.email,
+      isAdmin: verifiedAdmin.isAdmin,
+      hasPassword: !!verifiedAdmin.password,
+      passwordLength: verifiedAdmin.password.length,
+      passwordMatch: passwordMatch
+    });
+
+    if (!passwordMatch) {
+      throw new Error('Password verification failed!');
     }
+
+    console.log('\nAdmin account created successfully!');
+    console.log('Login credentials:');
+    console.log('Email:', adminEmail);
+    console.log('Password:', adminPassword);
 
   } catch (error) {
     console.error('Error:', error);
@@ -51,4 +59,4 @@ async function checkAdmin() {
   }
 }
 
-checkAdmin();
+createOrUpdateAdmin();
