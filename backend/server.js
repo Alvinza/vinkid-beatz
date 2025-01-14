@@ -17,7 +17,13 @@ const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: 'https://vinkid-beatz.onrender.com' }));
+app.use(cors({ 
+  origin: [
+    'http://localhost:3000',
+    'https://vinkid-beatz.onrender.com' // Addeddeployed frontend URL
+  ],
+  credentials: true
+}));
 const router = express.Router();
 
 app.use("/api", authRoutes);
