@@ -167,51 +167,53 @@ app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   
   try {
-    console.log('Login attempt details:', {
-      attemptedEmail: email,
-      passwordProvided: !!password
-    });
+    console.log('Login attempt for:', email);
     
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
     
-    // Log user lookup result
     console.log('User lookup result:', {
       userFound: !!user,
       email: user?.email,
       isAdmin: user?.isAdmin,
-      hasPassword: !!user?.password
+      hasPassword: !!user?.password,
+      passwordLength: user?.password?.length
     });
 
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "User not found" });
     }
 
-    // Add explicit password comparison logging
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password comparison:', {
+    console.log('Password comparison result:', {
       passwordMatch: isMatch,
       providedPasswordLength: password?.length,
-      storedPasswordHash: user.password?.substring(0, 10) + '...' // Only log part of the hash for security
+      hashedPasswordLength: user.password?.length
     });
 
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid password" });
     }
 
+    // Create token with admin status
     const token = jwt.sign(
-      { id: user._id, email: user.email, isAdmin: user.isAdmin },
+      { 
+        id: user._id, 
+        email: user.email, 
+        isAdmin: user.isAdmin 
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
     // Log successful login
     console.log('Login successful:', {
+      userId: user._id,
       email: user.email,
       isAdmin: user.isAdmin,
       tokenGenerated: !!token
     });
 
-    res.status(200).json({
+    res.json({
       name: user.username,
       email: user.email,
       isAdmin: user.isAdmin,
@@ -220,9 +222,10 @@ app.post("/api/login", async (req, res) => {
 
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+
 
 // Beat Routes
 app.get('/api/beats', async (req, res) => {
