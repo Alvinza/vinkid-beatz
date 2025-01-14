@@ -153,34 +153,35 @@ app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   
   try {
-    console.log('Login attempt:', { email });
+    console.log('Login attempt details:', {
+      attemptedEmail: email,
+      passwordProvided: !!password
+    });
     
     const user = await User.findOne({ email });
     
-    console.log('User found:', { 
-      exists: !!user, 
+    // Log user lookup result
+    console.log('User lookup result:', {
+      userFound: !!user,
+      email: user?.email,
       isAdmin: user?.isAdmin,
-      email: user?.email 
+      hasPassword: !!user?.password
     });
 
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // Add explicit password comparison logging
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password match:', isMatch);
+    console.log('Password comparison:', {
+      passwordMatch: isMatch,
+      providedPasswordLength: password?.length,
+      storedPasswordHash: user.password?.substring(0, 10) + '...' // Only log part of the hash for security
+    });
 
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    // Extra logging for admin attempts
-    if (email === 'vinkidbeatz@gmail.com') {
-      console.log('Admin login details:', {
-        providedPassword: password,
-        isAdmin: user.isAdmin,
-        passwordLength: password.length
-      });
     }
 
     const token = jwt.sign(
@@ -188,6 +189,13 @@ app.post("/api/login", async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+
+    // Log successful login
+    console.log('Login successful:', {
+      email: user.email,
+      isAdmin: user.isAdmin,
+      tokenGenerated: !!token
+    });
 
     res.status(200).json({
       name: user.username,
