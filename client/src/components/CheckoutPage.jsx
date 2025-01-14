@@ -6,7 +6,7 @@ function CheckoutPage() {
 
   const handlePayment = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/create-checkout-session', { cart });
+      const response = await axios.post('https://vinkid-beatz-backend.onrender.com/create-checkout-session', { cart });
       window.location.href = response.data.url; // Redirect to Stripe Checkout
     } catch (error) {
       console.error('Payment failed:', error);
