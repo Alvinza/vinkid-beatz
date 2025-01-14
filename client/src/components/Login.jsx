@@ -20,27 +20,31 @@ const Login = () => {
     password: Yup.string().required("Password is required"),
   });
 
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    try {
-      const response = await axios.post("https://vinkid-beatz-backend.onrender.com/api/login", values);
-      const { name, email, isAdmin } = response.data;
+ const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+  try {
+    const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+    const response = await axios.post(`${API_URL}/api/login`, values);
+    const { name, email, isAdmin, token } = response.data; // Make sure to get the token
 
-      login({ name, email, isAdmin });
+    // Store the token
+    localStorage.setItem('token', token);
+    
+    login({ name, email, isAdmin, token });
 
-      if (isAdmin) {
-        toast.success("Admin login successful");
-        navigate("/admin-panel");
-      } else {
-        toast.success("Login successful");
-        navigate("/");
-      }
-      resetForm();
-    } catch (error) {
-      console.error("Login error:", error);
-      toast.error(error.response?.data?.message || "Login failed");
+    if (isAdmin) {
+      toast.success("Admin login successful");
+      navigate("/admin-panel");
+    } else {
+      toast.success("Login successful");
+      navigate("/");
     }
-    setSubmitting(false);
-  };
+    resetForm();
+  } catch (error) {
+    console.error("Login error:", error);
+    toast.error(error.response?.data?.message || "Login failed");
+  }
+  setSubmitting(false);
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-white to-blue-50 p-4">
