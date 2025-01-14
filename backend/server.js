@@ -153,65 +153,52 @@ app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   
   try {
-    console.log('Login attempt for:', email);
+    console.log('Login attempt:', { email });
     
-    if (!email || !password) {
-      return res.status(400).json({ 
-        message: "Email and password are required" 
-      });
-    }
-
     const user = await User.findOne({ email });
     
-    // Debug log
-    console.log('User found:', {
-      exists: !!user,
+    console.log('User found:', { 
+      exists: !!user, 
       isAdmin: user?.isAdmin,
-      email: user?.email
+      email: user?.email 
     });
 
     if (!user) {
-      return res.status(401).json({ 
-        message: "Invalid credentials" 
-      });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    
-    // Debug log
     console.log('Password match:', isMatch);
 
     if (!isMatch) {
-      return res.status(401).json({ 
-        message: "Invalid credentials" 
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Extra logging for admin attempts
+    if (email === 'vinkidbeatz@gmail.com') {
+      console.log('Admin login details:', {
+        providedPassword: password,
+        isAdmin: user.isAdmin,
+        passwordLength: password.length
       });
     }
 
     const token = jwt.sign(
-      { 
-        id: user._id, 
-        email: user.email, 
-        isAdmin: user.isAdmin || false 
-      },
+      { id: user._id, email: user.email, isAdmin: user.isAdmin },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    console.log('Login successful for:', email);
-    console.log('User is admin:', user.isAdmin);
-
     res.status(200).json({
       name: user.username,
       email: user.email,
-      isAdmin: user.isAdmin || false,
-      token: token,
+      isAdmin: user.isAdmin,
+      token
     });
+
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ 
-      message: "Server error", 
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined 
-    });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
