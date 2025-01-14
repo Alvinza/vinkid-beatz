@@ -162,16 +162,26 @@ app.post("/api/login", async (req, res) => {
     }
 
     const user = await User.findOne({ email });
+    
+    // Debug log
+    console.log('User found:', {
+      exists: !!user,
+      isAdmin: user?.isAdmin,
+      email: user?.email
+    });
+
     if (!user) {
-      console.log('User not found:', email);
       return res.status(401).json({ 
         message: "Invalid credentials" 
       });
     }
 
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await bcrypt.compare(password, user.password);
+    
+    // Debug log
+    console.log('Password match:', isMatch);
+
     if (!isMatch) {
-      console.log('Password mismatch for user:', email);
       return res.status(401).json({ 
         message: "Invalid credentials" 
       });
@@ -188,6 +198,8 @@ app.post("/api/login", async (req, res) => {
     );
 
     console.log('Login successful for:', email);
+    console.log('User is admin:', user.isAdmin);
+
     res.status(200).json({
       name: user.username,
       email: user.email,
