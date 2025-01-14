@@ -20,9 +20,11 @@ app.use(express.json());
 app.use(cors({ 
   origin: [
     'http://localhost:3000',
-    'https://vinkid-beatz.onrender.com' // Addeddeployed frontend URL
+    'https://vinkid-beatz.onrender.com'
   ],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 const router = express.Router();
 
@@ -305,45 +307,39 @@ const AdminEmail = process.env.ADMIN_EMAIL;
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   try {
-    if (email === AdminEmail) {
-      if (password !== AdminPassword) {
-        return res.status(401).json({ message: "Invalid admin credentials" });
-      }
-      const adminToken = jwt.sign(
-        { email: AdminEmail, isAdmin: true },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
-      return res.status(200).json({
-        name: "Admin",
-        email: AdminEmail,
-        isAdmin: true,
-        token: adminToken,
-      });
-    }
-
+    console.log('Login attempt for:', email); // Add logging
+    
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid user credentials" });
+      console.log('User not found:', email);
+      return res.status(401).json({ message: "Invalid credentials" });
     }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid user credentials" });
+      console.log('Password mismatch for user:', email);
+      return res.status(401).json({ message: "Invalid credentials" });
     }
-    const userToken = jwt.sign(
-      { id: user._id, email: user.email, isAdmin: user.isAdmin || false },
+
+    const token = jwt.sign(
+      { 
+        id: user._id, 
+        email: user.email, 
+        isAdmin: user.isAdmin || false 
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+
     res.status(200).json({
       name: user.username,
       email: user.email,
       isAdmin: user.isAdmin || false,
-      token: userToken,
+      token: token,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Login error:', error);
+    res.status(500).json({ message: "Server error", details: error.message });
   }
 });
 
@@ -370,6 +366,32 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   }
 
   res.json({ received: true });
+});
+
+app.get('/api/verify-token', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findOne({ email: decoded.email }).select('-password');
+    
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    res.json({
+      name: user.username,
+      email: user.email,
+      isAdmin: user.isAdmin || false
+    });
+  } catch (error) {
+    console.error('Token verification error:', error);
+    res.status(401).json({ message: 'Invalid token' });
+  }
 });
 
 
