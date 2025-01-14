@@ -11,7 +11,7 @@ const BeatsDashboard = () => {
 
   const fetchBeats = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/beats');
+      const response = await fetch('https://vinkid-beatz-backend.onrender.com/api/beats');
       const data = await response.json();
       setBeats(data);
     } catch (error) {
@@ -26,7 +26,7 @@ const BeatsDashboard = () => {
 
   const handleUpdate = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/beats/${id}`, {
+      const response = await fetch(`https://vinkid-beatz-backend.onrender.com/api/beats/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ const BeatsDashboard = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this beat?')) {
       try {
-        const response = await fetch(`http://localhost:5000/api/beats/${id}`, {
+        const response = await fetch(`https://vinkid-beatz-backend.onrender.com/api/beats/${id}`, {
           method: 'DELETE',
         });
         
@@ -125,7 +125,7 @@ const BeatsDashboard = () => {
               <>
                 <div className="h-32 relative mb-2">
                   <img
-                    src={`http://localhost:5000${beat.picture}`}
+                    src={`https://vinkid-beatz-backend.onrender.com${beat.picture}`}
                     alt={beat.title}
                     className="object-cover w-full h-full rounded"
                   />
@@ -138,7 +138,7 @@ const BeatsDashboard = () => {
                     <p>Price: ${beat.price}</p>
                   </div>
                   <audio controls className="w-full mt-1 h-8 mr-5" style={{marginRight: "2rem"}}>
-                    <source src={`http://localhost:5000${beat.audio}`} type="audio/mpeg" />
+                    <source src={`https://vinkid-beatz-backend.onrender.com${beat.audio}`} type="audio/mpeg" />
                     Your browser does not support the audio element.
                   </audio>
                   <div className="flex gap-2">
