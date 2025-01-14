@@ -17,7 +17,7 @@ const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: 'https://vinkid-beatz.onrender.com' }));
 const router = express.Router();
 
 app.use("/api", authRoutes);
@@ -246,7 +246,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
           currency: 'usd',
           product_data: {
             name: beat.title,
-            images: beat.picture ? [`http://localhost:5000${beat.picture}`] : [],
+            images: beat.picture ? [`https://vinkid-beatz-backend.onrender.com${beat.picture}`] : [],
             description: `${beat.genre} beat - ${beat.bpm} BPM`,
           },
           unit_amount: Math.round(beat.price * 100), // Convert to cents
@@ -254,8 +254,8 @@ app.post('/api/create-checkout-session', async (req, res) => {
         quantity: 1,
       })),
       mode: 'payment',
-      success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/cart`,
+      success_url: `${process.env.FRONTEND_URL || 'https://vinkid-beatz.onrender.com'}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL || 'https://vinkid-beatz.onrender.com'}/cart`,
     });
 
     res.json({ sessionId: session.id });
