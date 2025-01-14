@@ -15,8 +15,16 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Middleware
-app.use(express.json());
+// Enhanced error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    message: 'Something broke!',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+  });
+});
+
+// Enhanced CORS configuration
 app.use(cors({ 
   origin: [
     'http://localhost:3000',
@@ -26,15 +34,28 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+app.use(express.json());
 const router = express.Router();
 
 app.use("/api", authRoutes);
+
+// Health check route
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
 
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
+
+// Enhanced Admin initialization
 async function initializeAdmin() {
   try {
     const adminEmail = process.env.ADMIN_EMAIL;
@@ -45,15 +66,12 @@ async function initializeAdmin() {
       return;
     }
 
-    // Check if admin already exists
     const existingAdmin = await User.findOne({ email: adminEmail });
     
     if (!existingAdmin) {
-      // Hash admin password
       const salt = await bcrypt.genSalt(12);
       const hashedPassword = await bcrypt.hash(adminPassword, salt);
       
-      // Create admin user
       const adminUser = new User({
         username: 'Admin',
         email: adminEmail,
@@ -69,66 +87,116 @@ async function initializeAdmin() {
   }
 }
 
-// Call this after MongoDB connection is established
+// Enhanced MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB');
-    initializeAdmin(); // Initialize admin user
+    console.log('Database connection string:', process.env.MONGO_URI.split('@')[1]); // Log database location (safely)
+    initializeAdmin();
   })
-  .catch((err) => console.error('Error connecting to MongoDB:', err));
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // Exit if database connection fails
+  });
 
+// Token verification route
+app.get('/api/verify-token', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
 
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findOne({ email: decoded.email }).select('-password');
+    
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
 
+    res.json({
+      name: user.username,
+      email: user.email,
+      isAdmin: user.isAdmin || false
+    });
+  } catch (error) {
+    console.error('Token verification error:', error);
+    res.status(401).json({ message: 'Invalid token' });
+  }
+});
 
-// Existing Beat Routes
+// Authentication Routes
+app.post('/api/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    console.log('Registration attempt for:', email);
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already registered' });
+    }
+
+    const newUser = new User({ username, email, password });
+    await newUser.save();
+    console.log('User registered successfully:', email);
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Registration failed', details: error.message });
+  }
+});
+
+// Enhanced login route
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    console.log('Login attempt for:', email);
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      console.log('User not found:', email);
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      console.log('Password mismatch for user:', email);
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { 
+        id: user._id, 
+        email: user.email, 
+        isAdmin: user.isAdmin || false 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    console.log('Login successful for:', email);
+    res.status(200).json({
+      name: user.username,
+      email: user.email,
+      isAdmin: user.isAdmin || false,
+      token: token,
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ message: "Server error", details: error.message });
+  }
+});
+
+// Beat Routes
 app.get('/api/beats', async (req, res) => {
   try {
     const beats = await Beat.find();
     res.json(beats);
   } catch (err) {
+    console.error('Error fetching beats:', err);
     res.status(500).json({ error: 'Failed to fetch beats' });
-  }
-});
-
-app.post('/api/beats', async (req, res) => {
-  try {
-    const { title, picture, bpm, price, genre, audio } = req.body;
-    if (!title || !picture || !bpm || !price || !genre || !audio) {
-      return res.status(400).json({ error: 'All fields are required!' });
-    }
-    const newBeat = new Beat({
-      title, picture, bpm, price, genre, audio,
-    });
-    await newBeat.save();
-    res.status(201).json({ message: 'Beat added successfully', beat: newBeat });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to add beat' });
-  }
-});
-
-app.get('/api/beats/search', async (req, res) => {
-  const query = req.query.q;
-  try {
-    const beats = await Beat.find({
-      $or: [
-        { title: { $regex: query, $options: 'i' } },
-        { genre: { $regex: query, $options: 'i' } },
-      ],
-    });
-    res.json(beats);
-  } catch (err) {
-    res.status(500).json({ message: 'Error fetching beats' });
-  }
-});
-
-app.get('/api/beats/genre/:genre', async (req, res) => {
-  try {
-    const genre = req.params.genre;
-    const beats = await Beat.find({ genre });
-    res.json(beats);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch beats by genre' });
   }
 });
 
@@ -157,88 +225,7 @@ const upload = multer({
   fileFilter,
 });
 
-// File Upload Route
-app.post('/api/upload-beat', upload.fields([{ name: 'picture' }, { name: 'audio' }]), async (req, res) => {
-  try {
-    const { title, bpm, price, genre } = req.body;
-    if (!title || !bpm || !price || !genre || !req.files.picture || !req.files.audio) {
-      return res.status(400).json({ error: 'All fields and files are required!' });
-    }
-    const newBeat = new Beat({
-      title,
-      picture: `/uploads/${req.files.picture[0].filename}`,
-      audio: `/uploads/${req.files.audio[0].filename}`,
-      bpm,
-      price,
-      genre,
-    });
-    await newBeat.save();
-    res.status(201).json({
-      message: 'Beat uploaded successfully!',
-      beat: newBeat,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to upload beat' });
-  }
-});
-
-// Add these routes to your server.js file
-
-// Update beat
-app.put('/api/beats/:id', async (req, res) => {
-  try {
-    const beatId = req.params.id;
-    const updateData = req.body;
-    
-    const updatedBeat = await Beat.findByIdAndUpdate(
-      beatId,
-      updateData,
-      { new: true }
-    );
-    
-    if (!updatedBeat) {
-      return res.status(404).json({ error: 'Beat not found' });
-    }
-    
-    res.json(updatedBeat);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to update beat' });
-  }
-});
-
-// Delete beat
-app.delete('/api/beats/:id', async (req, res) => {
-  try {
-    const beatId = req.params.id;
-    const beat = await Beat.findById(beatId);
-    
-    if (!beat) {
-      return res.status(404).json({ error: 'Beat not found' });
-    }
-    
-    // Delete associated files
-    if (beat.picture) {
-      const picturePath = path.join(__dirname, beat.picture);
-      if (fs.existsSync(picturePath)) {
-        fs.unlinkSync(picturePath);
-      }
-    }
-    
-    if (beat.audio) {
-      const audioPath = path.join(__dirname, beat.audio);
-      if (fs.existsSync(audioPath)) {
-        fs.unlinkSync(audioPath);
-      }
-    }
-    
-    await Beat.findByIdAndDelete(beatId);
-    res.json({ message: 'Beat deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to delete beat' });
-  }
-});
-// Enhanced Stripe Routes
+// Enhanced Stripe configuration
 app.post('/api/create-checkout-session', async (req, res) => {
   try {
     const { cart } = req.body;
@@ -257,7 +244,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
             images: beat.picture ? [`https://vinkid-beatz-backend.onrender.com${beat.picture}`] : [],
             description: `${beat.genre} beat - ${beat.bpm} BPM`,
           },
-          unit_amount: Math.round(beat.price * 100), // Convert to cents
+          unit_amount: Math.round(beat.price * 100),
         },
         quantity: 1,
       })),
@@ -273,134 +260,17 @@ app.post('/api/create-checkout-session', async (req, res) => {
   }
 });
 
-app.get('/api/checkout-session/:sessionId', async (req, res) => {
-  try {
-    const { sessionId } = req.params;
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
-    res.json(session);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve checkout session' });
-  }
-});
-
+// Static file serving
 app.use('/uploads', express.static('uploads'));
 
-// Authentication Routes
-app.post('/api/register', async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: 'Email already registered' });
-    }
-    // Remove the bcrypt.hash here - let the User model handle it
-    const newUser = new User({ username, email, password }); // Pass plain password
-    await newUser.save();
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Registration failed' });
-  }
-}); 
-const AdminPassword = process.env.ADMIN_PASSWORD;
-const AdminEmail = process.env.ADMIN_EMAIL;
-app.post("/api/login", async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    console.log('Login attempt for:', email); // Add logging
-    
-    const user = await User.findOne({ email });
-    if (!user) {
-      console.log('User not found:', email);
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      console.log('Password mismatch for user:', email);
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    const token = jwt.sign(
-      { 
-        id: user._id, 
-        email: user.email, 
-        isAdmin: user.isAdmin || false 
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    res.status(200).json({
-      name: user.username,
-      email: user.email,
-      isAdmin: user.isAdmin || false,
-      token: token,
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: "Server error", details: error.message });
-  }
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
 });
-
-// Stripe Webhook
-app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-  } catch (err) {
-    res.status(400).send(`Webhook Error: ${err.message}`);
-    return;
-  }
-
-  // Handle successful checkout
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    try {
-      console.log('Payment successful:', session.id);
-    } catch (error) {
-      console.error('Webhook processing error:', error);
-    }
-  }
-
-  res.json({ received: true });
-});
-
-app.get('/api/verify-token', async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  
-  if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ email: decoded.email }).select('-password');
-    
-    if (!user) {
-      return res.status(401).json({ message: 'User not found' });
-    }
-
-    res.json({
-      name: user.username,
-      email: user.email,
-      isAdmin: user.isAdmin || false
-    });
-  } catch (error) {
-    console.error('Token verification error:', error);
-    res.status(401).json({ message: 'Invalid token' });
-  }
-});
-
-
-// 404 Not Found handler for unmatched routes
-app.use((req, res, next) => {
-  res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
-});
-
 
 // Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+});
