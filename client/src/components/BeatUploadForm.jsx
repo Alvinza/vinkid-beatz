@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-
-
 function BeatUploadForm() {
   const [formData, setFormData] = useState({
     title: '',
@@ -35,7 +33,7 @@ function BeatUploadForm() {
     data.append('audio', files.audio);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/upload-beat', data, {
+      const response = await axios.post('https://vinkid-beatz-backend.onrender.com/api/upload-beat', data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success("Beat uploaded successfully!");
