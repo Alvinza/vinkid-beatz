@@ -21,26 +21,47 @@ const Login = () => {
   });
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    try {
-      const response = await axios.post("https://vinkid-beatz-backend.onrender.com/api/login", values);
-      const { name, email, isAdmin } = response.data;
-
-      login({ name, email, isAdmin });
-
-      if (isAdmin) {
-        toast.success("Admin login successful");
-        navigate("/admin-panel");
-      } else {
-        toast.success("Login successful");
-        navigate("/");
+  try {
+    console.log('Attempting login with:', values);
+    const response = await axios.post(
+      "https://vinkid-beatz-backend.onrender.com/api/login", 
+      values,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
       }
-      resetForm();
-    } catch (error) {
-      console.error("Login error:", error);
-      toast.error(error.response?.data?.message || "Login failed");
+    );
+    
+    console.log('Login response:', response.data);
+    const { name, email, isAdmin, token } = response.data;
+
+    // Store the token
+    localStorage.setItem('token', token);
+    
+    // Set axios default authorization header
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    login({ name, email, isAdmin, token });
+
+    if (isAdmin) {
+      toast.success("Admin login successful");
+      navigate("/admin-panel");
+    } else {
+      toast.success("Login successful");
+      navigate("/");
     }
-    setSubmitting(false);
-  };
+    resetForm();
+  } catch (error) {
+    console.error("Login error details:", {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    toast.error(error.response?.data?.message || "Login failed");
+  }
+  setSubmitting(false);
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-white to-blue-50 p-4">
