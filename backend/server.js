@@ -295,33 +295,43 @@ app.post('/api/register', async (req, res) => {
 }); 
 const AdminPassword = process.env.ADMIN_PASSWORD;
 const AdminEmail = process.env.ADMIN_EMAIL;
+
+
 // In server.js, replace the login route with this:
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('Login attempt for:', email); // Debug log
-
+    
+    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Check if this is the admin user
-    const isAdmin = user.isAdmin && email === process.env.ADMIN_EMAIL;
-    
-    // For admin, verify both stored password and env password
-    let isValidPassword = false;
-    if (isAdmin) {
-      isValidPassword = await bcrypt.compare(password, user.password);
+    // Special handling for admin login
+    if (email === process.env.ADMIN_EMAIL) {
+      // Verify against both stored password and environment password
+      const isEnvPasswordValid = password === process.env.ADMIN_PASSWORD;
+      const isStoredPasswordValid = await bcrypt.compare(password, user.password);
+      
+      if (!isEnvPasswordValid && !isStoredPasswordValid) {
+        return res.status(401).json({ message: "Invalid admin credentials" });
+      }
+
+      // Ensure admin flag is set
+      if (!user.isAdmin) {
+        user.isAdmin = true;
+        await user.save();
+      }
     } else {
-      isValidPassword = await bcrypt.compare(password, user.password);
+      // Regular user login
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
     }
 
-    if (!isValidPassword) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    // Generate JWT token
+    // Generate JWT token with admin status
     const token = jwt.sign(
       {
         id: user._id,
@@ -337,7 +347,7 @@ app.post("/api/login", async (req, res) => {
       name: user.username,
       email: user.email,
       isAdmin: user.isAdmin,
-      token: token
+      token
     });
 
   } catch (error) {
@@ -345,6 +355,52 @@ app.post("/api/login", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+// Add this function to ensure admin exists and has correct credentials
+async function ensureAdminUser() {
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    
+    if (!adminEmail || !adminPassword) {
+      console.error('Admin credentials not properly configured');
+      return;
+    }
+
+    let adminUser = await User.findOne({ email: adminEmail });
+    
+    if (adminUser) {
+      // Update existing admin
+      adminUser.isAdmin = true;
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      adminUser.password = hashedPassword;
+      await adminUser.save();
+    } else {
+      // Create new admin
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      adminUser = new User({
+        username: 'Admin',
+        email: adminEmail,
+        password: hashedPassword,
+        isAdmin: true
+      });
+      await adminUser.save();
+    }
+    
+    console.log('Admin user configured successfully');
+  } catch (error) {
+    console.error('Error configuring admin user:', error);
+  }
+}
+
+// Call this after MongoDB connection
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log('Connected to MongoDB');
+    ensureAdminUser(); // Ensure admin exists with correct credentials
+  })
+  .catch((err) => console.error('Error connecting to MongoDB:', err));
 
 // Add middleware to verify admin status
 const verifyAdmin = async (req, res, next) => {
