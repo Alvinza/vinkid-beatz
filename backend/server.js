@@ -17,7 +17,7 @@ const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: 'https://vinkid-beatz.onrender.com' }));
 const router = express.Router();
 
 app.use("/api", authRoutes);
@@ -254,8 +254,8 @@ app.post('/api/create-checkout-session', async (req, res) => {
         quantity: 1,
       })),
       mode: 'payment',
-      success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/cart`,
+      success_url: `${'https://vinkid-beatz.onrender.com'}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${'https://vinkid-beatz.onrender.com'}/cart`,
     });
 
     res.json({ sessionId: session.id });
@@ -364,12 +364,6 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   }
 
   res.json({ received: true });
-});
-
-
-// 404 Not Found handler for unmatched routes
-app.use((req, res, next) => {
-  res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
 
