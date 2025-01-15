@@ -296,49 +296,62 @@ app.post('/api/register', async (req, res) => {
 }); 
 const AdminPassword = process.env.ADMIN_PASSWORD;
 const AdminEmail = process.env.ADMIN_EMAIL;
+// In server.js, replace the login route with this:
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   try {
-    if (email === AdminEmail) {
-      if (password !== AdminPassword) {
-        return res.status(401).json({ message: "Invalid admin credentials" });
-      }
-      const adminToken = jwt.sign(
-        { email: AdminEmail, isAdmin: true },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
-      return res.status(200).json({
-        name: "Admin",
-        email: AdminEmail,
-        isAdmin: true,
-        token: adminToken,
-      });
-    }
-
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid user credentials" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid user credentials" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
-    const userToken = jwt.sign(
-      { id: user._id, email: user.email, isAdmin: user.isAdmin || false },
+
+    const token = jwt.sign(
+      { 
+        id: user._id, 
+        email: user.email, 
+        isAdmin: user.isAdmin 
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+
     res.status(200).json({
       name: user.username,
       email: user.email,
-      isAdmin: user.isAdmin || false,
-      token: userToken,
+      isAdmin: user.isAdmin,
+      token: token
     });
   } catch (error) {
-    console.error(error);
+    console.error('Login error:', error);
     res.status(500).json({ message: "Server error" });
   }
+});
+
+// Add this middleware to verify tokens
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+};
+
+// Protected route example
+app.get('/api/protected', verifyToken, (req, res) => {
+  res.json({ message: 'Protected data' });
 });
 
 // Stripe Webhook
