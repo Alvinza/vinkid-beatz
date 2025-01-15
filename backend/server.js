@@ -297,50 +297,70 @@ const AdminPassword = process.env.ADMIN_PASSWORD;
 const AdminEmail = process.env.ADMIN_EMAIL;
 // In server.js, replace the login route with this:
 app.post("/api/login", async (req, res) => {
-  const { email, password } = req.body;
   try {
+    const { email, password } = req.body;
+    console.log('Login attempt for:', email); // Debug log
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    // Check if this is the admin user
+    const isAdmin = user.isAdmin && email === process.env.ADMIN_EMAIL;
+    
+    // For admin, verify both stored password and env password
+    let isValidPassword = false;
+    if (isAdmin) {
+      isValidPassword = await bcrypt.compare(password, user.password);
+    } else {
+      isValidPassword = await bcrypt.compare(password, user.password);
+    }
+
+    if (!isValidPassword) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // Generate JWT token
     const token = jwt.sign(
-      { 
-        id: user._id, 
-        email: user.email, 
-        isAdmin: user.isAdmin 
+      {
+        id: user._id,
+        email: user.email,
+        isAdmin: user.isAdmin
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: '24h' }
     );
 
+    // Send response
     res.status(200).json({
       name: user.username,
       email: user.email,
       isAdmin: user.isAdmin,
       token: token
     });
+
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// Add this middleware to verify tokens
-const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  
-  if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
-
+// Add middleware to verify admin status
+const verifyAdmin = async (req, res, next) => {
   try {
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    if (!decoded.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
     req.user = decoded;
     next();
   } catch (error) {
@@ -348,11 +368,10 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Protected route example
-app.get('/api/protected', verifyToken, (req, res) => {
-  res.json({ message: 'Protected data' });
+// Example protected admin route
+app.get('/api/admin/dashboard', verifyAdmin, (req, res) => {
+  res.json({ message: 'Admin dashboard data' });
 });
-
 // Stripe Webhook
 app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];
