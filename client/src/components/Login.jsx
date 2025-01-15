@@ -20,40 +20,45 @@ const Login = () => {
     password: Yup.string().required("Password is required"),
   });
 
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+ const handleSubmit = async (values, { setSubmitting, resetForm }) => {
   try {
-    console.log('Attempting login with:', values);
+    console.log('Login attempt:', { email: values.email });
+    
     const response = await axios.post(
-      "https://vinkid-beatz-backend.onrender.com/api/login", 
+      "https://vinkid-beatz-backend.onrender.com/api/login",
       values,
       {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         }
       }
     );
-    
+
     console.log('Login response:', response.data);
+    
     const { name, email, isAdmin, token } = response.data;
 
-    // Store the token
+    // Store auth data
     localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify({ name, email, isAdmin }));
     
-    // Set axios default authorization header
+    // Update axios defaults
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
+    // Update context
     login({ name, email, isAdmin, token });
 
     if (isAdmin) {
-      toast.success("Admin login successful");
+      toast.success("Admin login successful!");
       navigate("/admin-panel");
     } else {
-      toast.success("Login successful");
+      toast.success("Login successful!");
       navigate("/");
     }
+    
     resetForm();
   } catch (error) {
-    console.error("Login error details:", {
+    console.error('Login error:', {
       message: error.message,
       response: error.response?.data,
       status: error.response?.status
@@ -62,7 +67,6 @@ const Login = () => {
   }
   setSubmitting(false);
 };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-white to-blue-50 p-4">
       <div className="w-full max-w-md transform transition-all duration-300 hover:shadow-xl">
