@@ -15,6 +15,12 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
+app.use(express.static(path.join(__dirname, './client/build')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, './client/build', 'index.html'));
+});
+
 // Enhanced error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
