@@ -15,11 +15,8 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-app.use(express.static(path.join(__dirname, './client/build')));
+app.use(express.static(path.join(__dirname, '../client/build')));
 
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, './client/build', 'index.html'));
-});
 
 // Enhanced error handling middleware
 app.use((err, req, res, next) => {
@@ -290,6 +287,10 @@ app.post('/api/create-checkout-session', async (req, res) => {
 
 // Static file serving
 app.use('/uploads', express.static('uploads'));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
 
 // 404 handler
 app.use((req, res) => {
