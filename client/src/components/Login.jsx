@@ -24,15 +24,15 @@ const Login = () => {
   try {
     console.log('Login attempt:', { email: values.email });
     
-    const response = await axios.post(
-      "https://vinkid-beatz-backend.onrender.com/api/login",
-      values,
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+   const response = await axios.post(
+  "https://vinkid-beatz-backend.onrender.com/api/login",
+  values,
+  {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }
+);
 
     console.log('Login response:', response.data);
     
