@@ -15,8 +15,8 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
+// Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/build')));
-
 
 // Enhanced error handling middleware
 app.use((err, req, res, next) => {
@@ -25,20 +25,6 @@ app.use((err, req, res, next) => {
     message: 'Something broke!',
     error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
   });
-});
-
-// Add this temporarily and remove after testing
-app.get("/api/check-admin", async (req, res) => {
-  try {
-    const admin = await User.findOne({ email: 'vinkidbeatz@gmail.com' });
-    res.json({
-      exists: !!admin,
-      isAdmin: admin?.isAdmin,
-      passwordLength: admin?.password?.length
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
 });
 
 // Enhanced CORS configuration
@@ -53,8 +39,6 @@ app.use(cors({
 }));
 
 app.use(express.json());
-const router = express.Router();
-
 app.use("/api", authRoutes);
 
 // Health check route
@@ -109,14 +93,13 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB');
-    console.log('Database connection string:', process.env.MONGO_URI.split('@')[1]); // Log database location (safely)
+    console.log('Database connection string:', process.env.MONGO_URI.split('@')[1]);
     initializeAdmin();
   })
   .catch((err) => {
     console.error('MongoDB connection error:', err);
-    process.exit(1); // Exit if database connection fails
+    process.exit(1);
   });
-
 // Token verification route
 app.get('/api/verify-token', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -148,8 +131,7 @@ app.get('/api/verify-token', async (req, res) => {
 app.post('/api/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    console.log('Registration attempt for:', email);
-
+    
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: 'Email already registered' });
@@ -157,7 +139,6 @@ app.post('/api/register', async (req, res) => {
 
     const newUser = new User({ username, email, password });
     await newUser.save();
-    console.log('User registered successfully:', email);
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error('Registration error:', error);
@@ -170,30 +151,18 @@ app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   
   try {
-    console.log('Login attempt:', { email, passwordLength: password?.length });
-    
     const user = await User.findOne({ email });
     
     if (!user) {
-      console.log('User not found:', email);
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    console.log('User found:', {
-      email: user.email,
-      isAdmin: user.isAdmin,
-      hasPassword: !!user.password,
-      passwordLength: user.password?.length
-    });
-
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password comparison:', { isMatch });
 
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    // Generate token
     const token = jwt.sign(
       { id: user._id, email: user.email, isAdmin: user.isAdmin },
       process.env.JWT_SECRET,
@@ -212,7 +181,6 @@ app.post("/api/login", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 // Beat Routes
 app.get('/api/beats', async (req, res) => {
@@ -288,6 +256,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
 // Static file serving
 app.use('/uploads', express.static('uploads'));
 
+// Serve React app for all other routes
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
