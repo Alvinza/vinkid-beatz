@@ -274,8 +274,8 @@ app.post('/api/create-checkout-session', async (req, res) => {
         quantity: 1,
       })),
       mode: 'payment',
-      success_url: `${process.env.FRONTEND_URL || 'https://vinkid-beatz.onrender.com'}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL || 'https://vinkid-beatz.onrender.com'}/cart`,
+      success_url: `${'https://vinkid-beatz.onrender.com'}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${'https://vinkid-beatz.onrender.com'}/cart`,
     });
 
     res.json({ sessionId: session.id });
