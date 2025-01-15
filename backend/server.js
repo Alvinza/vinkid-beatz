@@ -33,19 +33,18 @@ async function initializeAdmin() {
     const adminPassword = process.env.ADMIN_PASSWORD;
     
     if (!adminEmail || !adminPassword) {
-      console.error('Admin credentials not properly configured in environment variables');
+      console.error('Admin credentials not properly configured');
       return;
     }
 
-    // Check if admin already exists
     const existingAdmin = await User.findOne({ email: adminEmail });
     
     if (!existingAdmin) {
-      // Hash admin password
+      // Hash the admin password
       const salt = await bcrypt.genSalt(12);
       const hashedPassword = await bcrypt.hash(adminPassword, salt);
       
-      // Create admin user
+      // Create new admin user
       const adminUser = new User({
         username: 'Admin',
         email: adminEmail,
@@ -54,7 +53,7 @@ async function initializeAdmin() {
       });
       
       await adminUser.save();
-      console.log('Admin user initialized successfully');
+      console.log('Admin user created successfully');
     }
   } catch (error) {
     console.error('Error initializing admin:', error);
