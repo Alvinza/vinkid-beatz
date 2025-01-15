@@ -22,7 +22,7 @@ const Login = () => {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/login", values);
+      const response = await axios.post("https://vinkid-beatz-backend.onrender.com/api/login", values);
       const { name, email, isAdmin } = response.data;
 
       login({ name, email, isAdmin });
