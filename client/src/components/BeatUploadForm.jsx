@@ -47,6 +47,7 @@ function BeatUploadForm() {
       setLoading(false);
     }
   };
+  
   return (
   <div className="dashboard">
       <div className="beat-upload-container  text-gray-600">
