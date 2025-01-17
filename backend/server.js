@@ -155,14 +155,16 @@ app.post('/api/upload-beat', upload.fields([{ name: 'picture' }, { name: 'audio'
     if (!title || !bpm || !price || !genre || !req.files.picture || !req.files.audio) {
       return res.status(400).json({ error: 'All fields and files are required!' });
     }
+    
     const newBeat = new Beat({
       title,
-      picture: `/uploads/${req.files.picture[0].filename}`,
-      audio: `/uploads/${req.files.audio[0].filename}`,
+      picture: req.files.picture[0].path, // Cloudinary URL
+      audio: req.files.audio[0].path,     // Cloudinary URL
       bpm,
       price,
       genre,
     });
+    
     await newBeat.save();
     res.status(201).json({
       message: 'Beat uploaded successfully!',

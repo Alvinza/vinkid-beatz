@@ -13,40 +13,40 @@ function BeatUploadForm() {
   const [loading, setLoading] = useState(false);
   // const [uploadedBeat, setUploadedBeat] = useState(null);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleFileChange = (e) => {
-    setFiles({ ...files, [e.target.name]: e.target.files[0] });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     const data = new FormData();
-    data.append('title', formData.title);
-    data.append('bpm', formData.bpm);
-    data.append('price', formData.price);
-    data.append('genre', formData.genre);
-    data.append('picture', files.picture);
-    data.append('audio', files.audio);
-
+    
+    Object.keys(formData).forEach(key => {
+      data.append(key, formData[key]);
+    });
+    
+    if (files.picture) data.append('picture', files.picture);
+    if (files.audio) data.append('audio', files.audio);
+    
     try {
       const response = await axios.post('https://vinkid-beatz-backend.onrender.com/api/upload-beat', data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+      
       toast.success("Beat uploaded successfully!");
-      // setUploadedBeat(response.data); // Assuming backend returns the beat data
-      console.log(response.data);
+      // Clear form after successful upload
+      setFormData({
+        title: '',
+        bpm: '',
+        price: '',
+        genre: '',
+      });
+      setFiles({ picture: null, audio: null });
+      
     } catch (err) {
       console.error(err);
-      toast.error("Failed to upload beat");
+      toast.error(err.response?.data?.error || "Failed to upload beat");
     } finally {
       setLoading(false);
     }
   };
-
   return (
   <div className="dashboard">
       <div className="beat-upload-container  text-gray-600">
