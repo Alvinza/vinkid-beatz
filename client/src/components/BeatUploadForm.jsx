@@ -12,6 +12,13 @@ function BeatUploadForm() {
   const [files, setFiles] = useState({ picture: null, audio: null });
   const [loading, setLoading] = useState(false);
   // const [uploadedBeat, setUploadedBeat] = useState(null);
+const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e) => {
+    setFiles({ ...files, [e.target.name]: e.target.files[0] });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
