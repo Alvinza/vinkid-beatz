@@ -16,6 +16,11 @@ const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 const { upload } = require('./cloudinaryConfig.js');
+function normalizeFilePath(filePath) {
+  // Remove any absolute path components and ensure it starts with /uploads/
+  const filename = path.basename(filePath);
+  return `/uploads/${filename}`;
+}
 
 // Middleware
 app.use(express.json());
@@ -157,10 +162,14 @@ app.post('/api/upload-beat', upload.fields([
       return res.status(400).json({ error: 'All fields and files are required!' });
     }
 
+    // Normalize the file paths before saving
+    const normalizedPicturePath = normalizeFilePath(req.files.picture[0].path);
+    const normalizedAudioPath = normalizeFilePath(req.files.audio[0].path);
+
     const newBeat = new Beat({
       title,
-      picture: req.files.picture[0].path,
-      audio: req.files.audio[0].path,
+      picture: normalizedPicturePath,
+      audio: normalizedAudioPath,
       bpm: Number(bpm),
       price: Number(price),
       genre
