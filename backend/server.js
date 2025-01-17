@@ -15,7 +15,7 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-const { upload } = require('./cloudinaryConfig');
+const { upload } = require('./cloudinaryConfig.js');
 
 // Middleware
 app.use(express.json());
