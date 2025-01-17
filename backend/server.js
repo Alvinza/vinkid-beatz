@@ -15,6 +15,8 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
+const { upload } = require('./cloudinaryConfig');
+
 // Middleware
 app.use(express.json());
 app.use(cors({ origin: 'https://vinkid-beatz.onrender.com' }));
@@ -149,29 +151,33 @@ const upload = multer({
 });
 
 // File Upload Route
-app.post('/api/upload-beat', upload.fields([{ name: 'picture' }, { name: 'audio' }]), async (req, res) => {
+app.post('/api/upload-beat', upload.fields([
+  { name: 'picture', maxCount: 1 },
+  { name: 'audio', maxCount: 1 }
+]), async (req, res) => {
   try {
     const { title, bpm, price, genre } = req.body;
+    
     if (!title || !bpm || !price || !genre || !req.files.picture || !req.files.audio) {
       return res.status(400).json({ error: 'All fields and files are required!' });
     }
-    
+
     const newBeat = new Beat({
       title,
-      picture: req.files.picture[0].path, // Cloudinary URL
-      audio: req.files.audio[0].path,     // Cloudinary URL
-      bpm,
-      price,
-      genre,
+      picture: req.files.picture[0].path,
+      audio: req.files.audio[0].path,
+      bpm: Number(bpm),
+      price: Number(price),
+      genre
     });
-    
+
     await newBeat.save();
     res.status(201).json({
       message: 'Beat uploaded successfully!',
-      beat: newBeat,
+      beat: newBeat
     });
   } catch (err) {
-    console.error(err);
+    console.error('Upload error:', err);
     res.status(500).json({ error: 'Failed to upload beat' });
   }
 });
