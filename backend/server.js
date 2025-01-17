@@ -144,11 +144,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 20 * 1024 * 1024 },
-  fileFilter,
-});
 
 // File Upload Route
 app.post('/api/upload-beat', upload.fields([
