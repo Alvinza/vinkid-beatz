@@ -15,6 +15,8 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
+app.use(express.static(path.join(__dirname, 'client/build')));
+
 // Helper function to normalize file paths
 function normalizeFilePath(filePath) {
   const filename = path.basename(filePath);
@@ -405,6 +407,10 @@ app.use((err, req, res, next) => {
 // Admin dashboard route
 app.get('/api/admin/dashboard', verifyAdmin, (req, res) => {
   res.json({ message: 'Admin dashboard data' });
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 });
 
 // Handle 404 routes
