@@ -21,6 +21,8 @@ function normalizeFilePath(filePath) {
   return `/uploads/${filename}`;
 }
 
+app.use(express.static(path.join(__dirname, 'client/build')));
+
 // Middleware
 app.use(express.json());
 app.use(cors({ 
@@ -410,6 +412,10 @@ app.get('/api/admin/dashboard', verifyAdmin, (req, res) => {
 // Handle 404 routes
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 });
 
 // Start Server
