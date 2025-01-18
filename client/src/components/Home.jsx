@@ -34,7 +34,7 @@ const Home = () => {
             </button>
           </form>
           <div className="home-button">
-          <button onClick={homePage} >
+          <button onClick={homePage} style={{marginLeft: "2rem"}}>
             Explore More
           </button>
           </div>
