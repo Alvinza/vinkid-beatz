@@ -18,7 +18,30 @@ function BeatUploadForm() {
   };
 
   const handleFileChange = (e) => {
-    setFiles({ ...files, [e.target.name]: e.target.files[0] });
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file size (20MB limit)
+      if (file.size > 20 * 1024 * 1024) {
+        toast.error('File size must be less than 20MB');
+        e.target.value = '';
+        return;
+      }
+      
+      // Validate file types
+      if (e.target.name === 'picture' && !file.type.startsWith('image/')) {
+        toast.error('Please select a valid image file');
+        e.target.value = '';
+        return;
+      }
+      
+      if (e.target.name === 'audio' && !file.type.startsWith('audio/')) {
+        toast.error('Please select a valid audio file');
+        e.target.value = '';
+        return;
+      }
+      
+      setFiles({ ...files, [e.target.name]: file });
+    }
   };
 
   const uploadToCloudinary = async (file, type) => {
@@ -28,7 +51,7 @@ function BeatUploadForm() {
     
     try {
       const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/dxqqv0srw/${type}/upload`,
+        `https://api.cloudinary.com/v1_1/dxqqv0srw/${type === 'picture' ? 'image' : 'video'}/upload`,
         data,
         {
           onUploadProgress: (progressEvent) => {
@@ -37,10 +60,15 @@ function BeatUploadForm() {
           }
         }
       );
+      
+      if (!response.data || !response.data.secure_url) {
+        throw new Error(`Failed to get upload URL for ${type}`);
+      }
+      
       return response.data.secure_url;
     } catch (error) {
       console.error(`Error uploading ${type}:`, error);
-      throw new Error(`Failed to upload ${type}`);
+      throw new Error(`Failed to upload ${type}: ${error.message}`);
     }
   };
 
@@ -54,9 +82,13 @@ function BeatUploadForm() {
         throw new Error('Both picture and audio files are required');
       }
 
-      const pictureUrl = await uploadToCloudinary(files.picture, 'image');
-      const audioUrl = await uploadToCloudinary(files.audio, 'video');
+      // Upload files to Cloudinary
+      const [pictureUrl, audioUrl] = await Promise.all([
+        uploadToCloudinary(files.picture, 'picture'),
+        uploadToCloudinary(files.audio, 'audio')
+      ]);
 
+      // Prepare beat data
       const beatData = {
         ...formData,
         picture: pictureUrl,
@@ -64,11 +96,12 @@ function BeatUploadForm() {
       };
       // Send beat data to backend
       const response = await axios.post(
-        'https://vinkid-beatz-backend.onrender.com/api/upload-beat', 
+        'https://vinkid-beatz-backend.onrender.com/api/upload-beat',
         beatData,
         {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
           }
         }
       );
@@ -102,46 +135,60 @@ function BeatUploadForm() {
   return (
     <div className="dashboard">
       <div className="beat-upload-container text-gray-600">
-        <h2 className="text-white">Upload Beat</h2>
-        <form onSubmit={handleSubmit} className="beat-upload-form">
-          <input
-            type="text"
-            name="title"
-            placeholder="Title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-            className="w-full p-2 mb-4 rounded"
-          />
-          <input
-            type="number"
-            name="bpm"
-            placeholder="BPM"
-            value={formData.bpm}
-            onChange={handleChange}
-            required
-            className="w-full p-2 mb-4 rounded"
-          />
-          <input
-            type="number"
-            name="price"
-            placeholder="Price"
-            value={formData.price}
-            onChange={handleChange}
-            required
-            className="w-full p-2 mb-4 rounded"
-          />
-          <input
-            type="text"
-            name="genre"
-            placeholder="Genre"
-            value={formData.genre}
-            onChange={handleChange}
-            required
-            className="w-full p-2 mb-4 rounded"
-          />
+        <h2 className="text-white text-2xl font-bold mb-6">Upload Beat</h2>
+        <form onSubmit={handleSubmit} className="beat-upload-form space-y-4">
+          <div className="form-group">
+            <input
+              type="text"
+              name="title"
+              placeholder="Title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+              className="w-full p-3 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              type="number"
+              name="bpm"
+              placeholder="BPM"
+              value={formData.bpm}
+              onChange={handleChange}
+              required
+              min="1"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              type="number"
+              name="price"
+              placeholder="Price ($)"
+              value={formData.price}
+              onChange={handleChange}
+              required
+              min="0"
+              step="0.01"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              type="text"
+              name="genre"
+              placeholder="Genre"
+              value={formData.genre}
+              onChange={handleChange}
+              required
+              className="w-full p-3 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
           
-          <div className="mb-4">
+          <div className="form-group">
             <label className="block text-white mb-2">
               Cover Image {uploadProgress.picture > 0 && `(${uploadProgress.picture}%)`}
             </label>
@@ -151,11 +198,11 @@ function BeatUploadForm() {
               accept="image/*"
               onChange={handleFileChange}
               required
-              className="w-full p-2 rounded bg-white"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
           </div>
           
-          <div className="mb-4">
+          <div className="form-group">
             <label className="block text-white mb-2">
               Audio File {uploadProgress.audio > 0 && `(${uploadProgress.audio}%)`}
             </label>
@@ -165,14 +212,14 @@ function BeatUploadForm() {
               accept="audio/*"
               onChange={handleFileChange}
               required
-              className="w-full p-2 rounded bg-white"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
           </div>
 
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+            className="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {loading ? 'Uploading...' : 'Upload Beat'}
           </button>
