@@ -288,25 +288,18 @@ app.delete('/api/beats/:id', verifyAdmin, async (req, res) => {
 });
 
 // File Upload Route
-app.post('/api/upload-beat', verifyAdmin, upload.fields([
-  { name: 'picture', maxCount: 1 },
-  { name: 'audio', maxCount: 1 }
-]), async (req, res) => {
+app.post('/api/upload-beat', verifyAdmin, async (req, res) => {
   try {
-    const { title, bpm, price, genre } = req.body;
+    const { title, bpm, price, genre, picture, audio } = req.body;
     
-    if (!title || !bpm || !price || !genre || !req.files.picture || !req.files.audio) {
-      return res.status(400).json({ error: 'All fields and files are required!' });
+    if (!title || !bpm || !price || !genre || !picture || !audio) {
+      return res.status(400).json({ error: 'All fields are required!' });
     }
-
-    // Normalize the file paths
-    const normalizedPicturePath = normalizeFilePath(req.files.picture[0].path);
-    const normalizedAudioPath = normalizeFilePath(req.files.audio[0].path);
 
     const newBeat = new Beat({
       title,
-      picture: normalizedPicturePath,
-      audio: normalizedAudioPath,
+      picture,
+      audio,
       bpm: Number(bpm),
       price: Number(price),
       genre
