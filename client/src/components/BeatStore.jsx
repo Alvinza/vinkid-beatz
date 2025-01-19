@@ -29,7 +29,6 @@ function BeatStore() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Previous functions remain the same until nextBeat and previousBeat
   const handleAddToCart = (beat) => {
     const added = addToCart(beat);
     if (added) {
@@ -60,7 +59,6 @@ function BeatStore() {
     fetchBeats();
   }, [selectedGenre]);
 
-  // The sorting useEffect remains the same
   useEffect(() => {
     let filterBeats = query || searchQuery
       ? beats.filter((beat) =>
@@ -92,7 +90,7 @@ function BeatStore() {
 
   useEffect(() => {
     if (audioRef.current && playingBeat) {
-      const newBeatSrc = `https://vinkid-beatz-backend.onrender.com${playingBeat.audio}`;
+      const newBeatSrc = playingBeat.audio;
 
       if (newBeatSrc !== currentBeatSrc) {
         audioRef.current.src = newBeatSrc;
@@ -108,7 +106,6 @@ function BeatStore() {
       }
     }
   }, [playingBeat, isPlaying, currentBeatSrc]);
-
   const playBeat = (beat) => {
     if (playingBeat && playingBeat._id === beat._id) {
       setIsPlaying(!isPlaying);
@@ -118,7 +115,6 @@ function BeatStore() {
     }
   };
 
-  // Fixed nextBeat function
   const nextBeat = () => {
     if (playingBeat && filteredBeats.length > 0) {
       const currentIndex = filteredBeats.findIndex(
@@ -130,7 +126,6 @@ function BeatStore() {
     }
   };
 
-  // Fixed previousBeat function
   const previousBeat = () => {
     if (playingBeat && filteredBeats.length > 0) {
       const currentIndex = filteredBeats.findIndex(
@@ -204,7 +199,7 @@ function BeatStore() {
 
                 <img
                   className="beat-image"
-                  src={`https://vinkid-beatz-backend.onrender.com${beat.picture}`}
+                  src={beat.picture}
                   alt={beat.title}
                 />
                 <div className="beat-details">
@@ -242,7 +237,7 @@ function BeatStore() {
                 <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-1/3">
                   <img
                     className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover"
-                    src={`https://vinkid-beatz-backend.onrender.com${playingBeat.picture}`}
+                    src={playingBeat.picture}
                     alt={playingBeat.title}
                   />
                   <div className="player-info">
