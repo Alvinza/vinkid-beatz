@@ -9,6 +9,11 @@ const BeatsDashboard = () => {
     fetchBeats();
   }, []);
 
+  const getAuthToken = () => {
+    // Get the token from localStorage or wherever you store it after login
+    return localStorage.getItem('token');
+  };
+
   const fetchBeats = async () => {
     try {
       const response = await fetch('https://vinkid-beatz-backend.onrender.com/api/beats');
@@ -26,10 +31,12 @@ const BeatsDashboard = () => {
 
   const handleUpdate = async (id) => {
     try {
+      const token = getAuthToken();
       const response = await fetch(`https://vinkid-beatz-backend.onrender.com/api/beats/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(editForm),
       });
@@ -37,24 +44,36 @@ const BeatsDashboard = () => {
       if (response.ok) {
         setEditingId(null);
         fetchBeats();
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Failed to update beat');
       }
     } catch (error) {
       console.error('Error updating beat:', error);
+      alert('Failed to update beat');
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this beat?')) {
       try {
+        const token = getAuthToken();
         const response = await fetch(`https://vinkid-beatz-backend.onrender.com/api/beats/${id}`, {
           method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         
         if (response.ok) {
           fetchBeats();
+        } else {
+          const error = await response.json();
+          alert(error.message || 'Failed to delete beat');
         }
       } catch (error) {
         console.error('Error deleting beat:', error);
+        alert('Failed to delete beat');
       }
     }
   };
@@ -81,7 +100,7 @@ const BeatsDashboard = () => {
                   <input
                     type="number"
                     value={editForm.bpm}
-                    onChange={(e) => setEditForm({ ...editForm, bpm: e.target.value })}
+                    onChange={(e) => setEditForm({ ...editForm, bpm: Number(e.target.value) })}
                     placeholder="BPM"
                     className="w-full p-1 text-sm border rounded"
                   />
@@ -91,7 +110,7 @@ const BeatsDashboard = () => {
                     type="number"
                     step="0.01"
                     value={editForm.price}
-                    onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                    onChange={(e) => setEditForm({ ...editForm, price: Number(e.target.value) })}
                     placeholder="Price"
                     className="w-full p-1 text-sm border rounded"
                   />
@@ -125,7 +144,7 @@ const BeatsDashboard = () => {
               <>
                 <div className="h-32 relative mb-2">
                   <img
-                    src={`https://vinkid-beatz-backend.onrender.com${beat.picture}`}
+                    src={beat.picture} // Direct Cloudinary URL
                     alt={beat.title}
                     className="object-cover w-full h-full rounded"
                   />
@@ -137,8 +156,8 @@ const BeatsDashboard = () => {
                     <p>BPM: {beat.bpm}</p>
                     <p>Price: ${beat.price}</p>
                   </div>
-                  <audio controls className="w-full mt-1 h-8 mr-5" style={{marginRight: "2rem"}}>
-                    <source src={`https://vinkid-beatz-backend.onrender.com${beat.audio}`} type="audio/mpeg" />
+                  <audio controls className="w-full mt-1 h-8">
+                    <source src={beat.audio} type="audio/mpeg" /> {/* Direct Cloudinary URL */}
                     Your browser does not support the audio element.
                   </audio>
                   <div className="flex gap-2">
