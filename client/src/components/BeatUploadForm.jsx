@@ -33,9 +33,9 @@ function BeatUploadForm() {
       if (files.picture) {
         const pictureData = new FormData();
         pictureData.append('file', files.picture);
-        pictureData.append('upload_preset', 'your_cloudinary_upload_preset'); // Replace with your upload preset
+        pictureData.append('upload_preset', 'beats_upload'); // Replace with your upload preset
         const pictureUpload = axios.post(
-          `https://api.cloudinary.com/v1_1/your_cloud_name/image/upload`, // Replace with your cloud name
+          `https://api.cloudinary.com/v1_1/dxqqv0srw/image/upload`, // Replace with your cloud name
           pictureData
         );
         uploadPromises.push(pictureUpload);
@@ -44,9 +44,9 @@ function BeatUploadForm() {
       if (files.audio) {
         const audioData = new FormData();
         audioData.append('file', files.audio);
-        audioData.append('upload_preset', 'your_cloudinary_upload_preset'); // Replace with your upload preset
+        audioData.append('upload_preset', 'beats_upload'); // Replace with your upload preset
         const audioUpload = axios.post(
-          `https://api.cloudinary.com/v1_1/your_cloud_name/video/upload`, // Replace with your cloud name
+          `https://api.cloudinary.com/v1_1/dxqqv0srw/video/upload`, // Replace with your cloud name
           audioData
         );
         uploadPromises.push(audioUpload);
