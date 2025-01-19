@@ -11,6 +11,7 @@ const User = require('./models/User.js');
 const jwt = require('jsonwebtoken');
 const authRoutes = require("./routes/authRoutes");
 const bcrypt = require('bcryptjs');
+const cloudinary = require('cloudinary').v2;
 
 const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
@@ -20,6 +21,12 @@ function normalizeFilePath(filePath) {
   const filename = path.basename(filePath);
   return `/uploads/${filename}`;
 }
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 // Middleware
 app.use(express.json());
@@ -292,27 +299,39 @@ app.post('/api/upload-beat', verifyAdmin, async (req, res) => {
   try {
     const { title, bpm, price, genre, picture, audio } = req.body;
     
-    if (!title || !bpm || !price || !genre || !picture || !audio) {
+    // Validate required fields
+    if (!title || !bpm || !price || !genre) {
       return res.status(400).json({ error: 'All fields are required!' });
     }
 
+    // Validate that we have both media URLs
+    if (!picture || !audio) {
+      return res.status(400).json({ error: 'Both picture and audio files are required!' });
+    }
+
+    // Create the beat document
     const newBeat = new Beat({
       title,
-      picture,
-      audio,
+      picture, // Using the Cloudinary URL directly
+      audio,   // Using the Cloudinary URL directly
       bpm: Number(bpm),
       price: Number(price),
       genre
     });
 
     await newBeat.save();
+
     res.status(201).json({
       message: 'Beat uploaded successfully!',
       beat: newBeat
     });
   } catch (err) {
     console.error('Upload error:', err);
-    res.status(500).json({ error: 'Failed to upload beat' });
+    // Send more detailed error message
+    res.status(500).json({ 
+      error: 'Failed to upload beat',
+      details: err.message 
+    });
   }
 });
 
