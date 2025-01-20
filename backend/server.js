@@ -22,6 +22,9 @@ function normalizeFilePath(filePath) {
   return `/uploads/${filename}`;
 }
 
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../client/build')));
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -419,10 +422,18 @@ app.get('/api/admin/dashboard', verifyAdmin, (req, res) => {
   res.json({ message: 'Admin dashboard data' });
 });
 
-// Handle 404 routes
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+// The "catch-all" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  // Don't redirect API calls
+  if (!req.url.startsWith('/api/')) {
+    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+  } else {
+    // If it's an API call that wasn't matched, send 404
+    res.status(404).json({ error: 'API route not found' });
+  }
 });
+
 
 // Start Server
 const PORT = process.env.PORT || 5000;
