@@ -3,6 +3,7 @@ import {motion} from 'motion/react'
 
 const Faq = () => {
   return (
+    // Animated container with motion library
     <motion.div
     initial={{opacity: 0, y:100}}
     transition={{duration: 1.5}}
@@ -14,10 +15,12 @@ const Faq = () => {
           <h1>FAQ</h1>
           <h2>Frequently Asked Questions</h2>
         </div>
-
+        
+        {/* Dynamically render FAQ items */}
         <div className="faq-content">
           {faqData.map((faq, index) => (
             <div key={index} className="faq-item">
+              {/* Display question with numbered index */}
               <h1>{`${index + 1}: ${faq.question}`}</h1>
               <p dangerouslySetInnerHTML={{ __html: faq.answer }} />
             </div>
