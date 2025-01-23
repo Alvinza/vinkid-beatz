@@ -184,9 +184,7 @@ app.post("/api/login", async (req, res) => {
     console.error('Login error:', error);
     res.status(500).json({ message: "Server error" });
   }
-});
-
-// Middleware to verify admin status
+}); // Middleware to verify admin status
 const verifyAdmin = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -433,7 +431,6 @@ app.get('*', (req, res) => {
     res.status(404).json({ error: 'API route not found' });
   }
 });
-
 
 // Start Server
 const PORT = process.env.PORT || 5000;
