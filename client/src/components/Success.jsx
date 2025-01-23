@@ -3,18 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from './CartContext';
 
 const Success = () => {
+  // Access cart clearing function from CartContext
   const { clearCart } = useCart();
+
+  // Navigation hook for routing
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Clear the cart when reaching success page
+    // Automatically clear the cart when the success page is loaded
+    // Ensures the cart is reset after a successful purchase
     clearCart();
   }, [clearCart]);
 
   return (
     <div className="max-w-md mx-auto mt-24 p-6 bg-white rounded-lg shadow-lg text-center">
+      {/* Success message with celebratory emojis */}
       <h1 className="text-3xl font-bold text-green-600 mb-4">Payment Successful! 🎉🎉</h1>
+      
+      {/* Confirmation message */}
       <p className="text-gray-600 mb-6">Thank you for your purchase.</p>
+      
+      {/* Button to return to beats store */}
       <button
         onClick={() => navigate('/beats')}
         className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
