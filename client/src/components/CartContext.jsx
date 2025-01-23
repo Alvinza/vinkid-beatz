@@ -1,36 +1,49 @@
 import React, { createContext, useReducer, useContext } from 'react';
+// Import user context for authentication check
 import { useUser } from './UserContext';
+// Import toast for notifications
 import { toast } from 'react-toastify';
 
+// Create context for cart management
 const CartContext = createContext();
 
+// Reducer function to manage cart state
 const cartReducer = (state, action) => {
   switch (action.type) {
+    // Add item to cart if not already present
     case 'ADD_TO_CART':
       if (state.find(item => item._id === action.payload._id)) {
         return state;
       }
       return [...state, action.payload];
-
+    
+    // Remove specific item from cart
     case 'REMOVE_FROM_CART':
       return state.filter(item => item._id !== action.payload);
-
+    
+    // Clear entire cart
     case 'CLEAR_CART':
       return [];
-
+    
+    // Load cart from storage
     case 'LOAD_CART':
       return action.payload;
-
+    
+    // Return current state if no matching action
     default:
       return state;
   }
 };
 
+// Provider component to manage cart state and operations
 export const CartProvider = ({ children }) => {
+  // Get authentication status
   const { isAuthenticated } = useUser();
+  
+  // Initialize cart state with reducer
   const [cart, dispatch] = useReducer(cartReducer, []);
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage on component mount
   React.useEffect(() => {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
@@ -43,6 +56,7 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
+  // Function to add item to cart with authentication check
   const addToCart = (item) => {
     if (!isAuthenticated()) {
       toast.error('Please login to add beats to cart');
@@ -52,17 +66,20 @@ export const CartProvider = ({ children }) => {
     return true;
   };
   
+  // Function to remove item from cart
   const removeFromCart = (itemId) => {
     dispatch({ type: 'REMOVE_FROM_CART', payload: itemId });
-    // toast.success('Item removed from cart');
+    // Commented out toast for success notification
   };
   
+  // Function to clear entire cart
   const clearCart = () => {
     dispatch({ type: 'CLEAR_CART' });
     localStorage.removeItem('cart');
-    // toast.success('Cart cleared');
+    // Commented out toast for success notification
   };
 
+  // Provide cart context to children components
   return (
     <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
       {children}
@@ -70,6 +87,7 @@ export const CartProvider = ({ children }) => {
   );
 };
 
+// Custom hook to use cart context
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
