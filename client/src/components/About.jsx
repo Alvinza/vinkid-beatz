@@ -1,16 +1,19 @@
 import React from "react";
+// Importing icons from FontAwesome for social media links
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faInstagram,
   faFacebook,
   faYoutube,
 } from "@fortawesome/free-brands-svg-icons";
-
+// Importing profile picture
 import pic from "../assets/pic1.jpg";
+// Importing motion library for animation
 import { motion } from "motion/react";
 
 const About = () => {
   return (
+    // Animated container with motion library for page entrance effect
     <motion.div
       initial={{ opacity: 0, x: 100 }}
       transition={{ duration: 1.5 }}
@@ -18,14 +21,19 @@ const About = () => {
       viewport={{ once: true }}
     >
       <div className="p-4 sm:p-6 about container mx-auto max-w-4xl">
+        {/* Page title */}
         <h2 className="text-2xl sm:text-3xl font-medium mb-4 text-slate-700 text-center">
           Welcome to Vinkid Beatz!
         </h2>
+        
+        {/* Profile picture with responsive sizing */}
         <img
           src={pic}
           alt="Vinkid Beatz"
           className="rounded-full w-40 h-40 sm:w-56 sm:h-56 mb-4 mx-auto object-cover"
         />
+        
+        {/* About section with responsive text sizing */}
         <div className="space-y-4 text-center px-4">
           <p className="text-black text-base sm:text-lg lg:text-xl">
             Hi, I'm Vinkid Beatz, a 21-year-old music producer from South Africa,
@@ -43,6 +51,8 @@ const About = () => {
             Let's make magic together—explore the world of Vinkid Beatz today!
           </p>
         </div>
+        
+        {/* Social media links section with icons */}
         <div className="flex justify-center mt-6 space-x-6">
           <a
             href="https://www.instagram.com/vinkid_beatz/"
@@ -73,5 +83,4 @@ const About = () => {
     </motion.div>
   );
 };
-
 export default About;
