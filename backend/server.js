@@ -1,44 +1,48 @@
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
-const multer = require('multer');
-const Beat = require('./models/Beat.js');
-const Stripe = require('stripe');
-const User = require('./models/User.js');
-const jwt = require('jsonwebtoken');
-const authRoutes = require("./routes/authRoutes");
-const bcrypt = require('bcryptjs');
-const cloudinary = require('cloudinary').v2;
+// Import required dependencies
+require('dotenv').config(); // Load environment variables
+const express = require('express'); // Web application framework
+const mongoose = require('mongoose'); // MongoDB object modeling tool
+const cors = require('cors'); // Cross-Origin Resource Sharing middleware
+const path = require('path'); // File path utility
+const fs = require('fs'); // File system operations
+const multer = require('multer'); // Middleware for handling multipart/form-data (file uploads)
+const Beat = require('./models/Beat.js'); // Beat model schema
+const Stripe = require('stripe'); // Payment processing library
+const User = require('./models/User.js'); // User model schema
+const jwt = require('jsonwebtoken'); // JSON Web Token implementation
+const authRoutes = require("./routes/authRoutes"); // Custom authentication routes
+const bcrypt = require('bcryptjs'); // Password hashing library
+const cloudinary = require('cloudinary').v2; // Cloud storage for media files
 
+// Initialize Express application
 const app = express();
+// Initialize Stripe with secret key from environment variables
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Helper function to normalize file paths
+// Helper function to normalize file paths for consistent URL generation
 function normalizeFilePath(filePath) {
   const filename = path.basename(filePath);
   return `/uploads/${filename}`;
 }
 
-// Serve static files from the React app
+// Serve static files from React build directory
 app.use(express.static(path.join(__dirname, '../client/build')));
 
+// Configure Cloudinary for cloud file storage
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Middleware
-app.use(express.json());
+// Middleware setup
+app.use(express.json()); // Parse JSON request bodies
 app.use(cors({ 
-  origin: ['https://vinkid-beatz.onrender.com'],
-  credentials: true
+  origin: ['https://vinkid-beatz.onrender.com'], // Allowed origin for CORS
+  credentials: true // Allow credentials (cookies, authorization headers)
 }));
 
-// Ensure uploads directory exists
+// Ensure uploads directory exists for local file storage
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -46,54 +50,67 @@ if (!fs.existsSync(uploadDir)) {
 
 // File Upload Configuration
 const storage = multer.diskStorage({
+  // Set destination for uploaded files
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
+  // Generate unique filename for each uploaded file
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, uniqueSuffix + path.extname(file.originalname));
   },
 });
 
+// File type validation for uploads
 const fileFilter = (req, file, cb) => {
   const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
   const allowedAudioTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3'];
   
+  // Validate image uploads
   if (file.fieldname === 'picture' && allowedImageTypes.includes(file.mimetype)) {
     cb(null, true);
-  } else if (file.fieldname === 'audio' && allowedAudioTypes.includes(file.mimetype)) {
+  } 
+  // Validate audio uploads  
+  else if (file.fieldname === 'audio' && allowedAudioTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
     cb(new Error('Invalid file type'), false);
   }
 };
 
+// Configure multer for file uploads
 const upload = multer({
-  storage,
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB limit
-  fileFilter,
+  storage, // Use custom storage configuration
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB file size limit
+  fileFilter, // Use custom file type validation
 });
 
-// Serve static files
+// Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Include authentication routes
 app.use("/api", authRoutes);
 
+// Function to initialize admin user during application startup
 async function initializeAdmin() {
   try {
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPassword = process.env.ADMIN_PASSWORD;
     
+    // Validate admin credentials are configured
     if (!adminEmail || !adminPassword) {
       console.error('Admin credentials not properly configured');
       return;
     }
 
+    // Check if admin user already exists
     const existingAdmin = await User.findOne({ email: adminEmail });
     
     if (!existingAdmin) {
+      // Generate salt and hash password for secure storage
       const salt = await bcrypt.genSalt(12);
       const hashedPassword = await bcrypt.hash(adminPassword, salt);
       
+      // Create new admin user
       const adminUser = new User({
         username: 'Admin',
         email: adminEmail,
@@ -109,23 +126,25 @@ async function initializeAdmin() {
   }
 }
 
-// MongoDB Connection
+// MongoDB Connection with initialization of admin user
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB');
-    initializeAdmin();
+    initializeAdmin(); // Create admin user if not exists
   })
   .catch((err) => console.error('Error connecting to MongoDB:', err));
 
-// Authentication Routes
+// User Registration Route
 app.post('/api/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: 'Email already registered' });
     }
+    // Create new user
     const newUser = new User({ username, email, password });
     await newUser.save();
     res.status(201).json({ message: 'User registered successfully' });
@@ -135,34 +154,41 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// User Login Route
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     
+    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // Special handling for admin login
     if (email === process.env.ADMIN_EMAIL) {
       const isEnvPasswordValid = password === process.env.ADMIN_PASSWORD;
       const isStoredPasswordValid = await bcrypt.compare(password, user.password);
       
+      // Validate admin password
       if (!isEnvPasswordValid && !isStoredPasswordValid) {
         return res.status(401).json({ message: "Invalid admin credentials" });
       }
 
+      // Ensure admin status
       if (!user.isAdmin) {
         user.isAdmin = true;
         await user.save();
       }
     } else {
+      // Regular user password validation
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
     }
 
+    // Generate JWT token
     const token = jwt.sign(
       {
         id: user._id,
@@ -173,6 +199,7 @@ app.post("/api/login", async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    // Return user details and token
     res.status(200).json({
       name: user.username,
       email: user.email,
@@ -184,17 +211,22 @@ app.post("/api/login", async (req, res) => {
     console.error('Login error:', error);
     res.status(500).json({ message: "Server error" });
   }
-}); // Middleware to verify admin status
+});
+
+// Middleware to verify admin authentication
 const verifyAdmin = async (req, res, next) => {
   try {
+    // Extract token from Authorization header
     const token = req.headers.authorization?.split(' ')[1];
     
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
     }
 
+    // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
+    // Check admin status
     if (!decoded.isAdmin) {
       return res.status(403).json({ message: 'Admin access required' });
     }
@@ -206,7 +238,7 @@ const verifyAdmin = async (req, res, next) => {
   }
 };
 
-// Beat Routes
+// Beat Routes continue... (fetching, searching, updating, deleting beats)
 app.get('/api/beats', async (req, res) => {
   try {
     const beats = await Beat.find();
@@ -216,6 +248,7 @@ app.get('/api/beats', async (req, res) => {
   }
 });
 
+// Search beats by title or genre
 app.get('/api/beats/search', async (req, res) => {
   const query = req.query.q;
   try {
@@ -231,6 +264,7 @@ app.get('/api/beats/search', async (req, res) => {
   }
 });
 
+// Fetch beats by specific genre
 app.get('/api/beats/genre/:genre', async (req, res) => {
   try {
     const genre = req.params.genre;
@@ -241,7 +275,7 @@ app.get('/api/beats/genre/:genre', async (req, res) => {
   }
 });
 
-// Update beat
+// Update beat (admin-only)
 app.put('/api/beats/:id', verifyAdmin, async (req, res) => {
   try {
     const beatId = req.params.id;
@@ -263,7 +297,7 @@ app.put('/api/beats/:id', verifyAdmin, async (req, res) => {
   }
 });
 
-// Delete beat
+// Delete beat (admin-only)
 app.delete('/api/beats/:id', verifyAdmin, async (req, res) => {
   try {
     const beatId = req.params.id;
@@ -273,7 +307,7 @@ app.delete('/api/beats/:id', verifyAdmin, async (req, res) => {
       return res.status(404).json({ error: 'Beat not found' });
     }
     
-    // Delete associated files
+    // Delete associated local files
     if (beat.picture) {
       const picturePath = path.join(__dirname, beat.picture);
       if (fs.existsSync(picturePath)) {
@@ -294,8 +328,7 @@ app.delete('/api/beats/:id', verifyAdmin, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete beat' });
   }
 });
-
-// File Upload Route
+// Beat Upload Route (Admin-only)
 app.post('/api/upload-beat', verifyAdmin, async (req, res) => {
   try {
     const { title, bpm, price, genre, picture, audio } = req.body;
@@ -305,16 +338,16 @@ app.post('/api/upload-beat', verifyAdmin, async (req, res) => {
       return res.status(400).json({ error: 'All fields are required!' });
     }
 
-    // Validate that we have both media URLs
+    // Ensure both media URLs are present
     if (!picture || !audio) {
       return res.status(400).json({ error: 'Both picture and audio files are required!' });
     }
 
-    // Create the beat document
+    // Create new beat document
     const newBeat = new Beat({
       title,
-      picture, // Using the Cloudinary URL directly
-      audio,   // Using the Cloudinary URL directly
+      picture, // Cloudinary URL
+      audio,   // Cloudinary URL
       bpm: Number(bpm),
       price: Number(price),
       genre
@@ -328,7 +361,6 @@ app.post('/api/upload-beat', verifyAdmin, async (req, res) => {
     });
   } catch (err) {
     console.error('Upload error:', err);
-    // Send more detailed error message
     res.status(500).json({ 
       error: 'Failed to upload beat',
       details: err.message 
@@ -336,7 +368,7 @@ app.post('/api/upload-beat', verifyAdmin, async (req, res) => {
   }
 });
 
-// Stripe Routes
+// Stripe Checkout Session Creation Route
 app.post('/api/create-checkout-session', async (req, res) => {
   try {
     const { cart } = req.body;
@@ -345,6 +377,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
       return res.status(400).json({ error: 'Cart is empty' });
     }
 
+    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: cart.map((beat) => ({
@@ -371,6 +404,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
   }
 });
 
+// Retrieve Stripe Checkout Session
 app.get('/api/checkout-session/:sessionId', async (req, res) => {
   try {
     const { sessionId } = req.params;
@@ -381,23 +415,25 @@ app.get('/api/checkout-session/:sessionId', async (req, res) => {
   }
 });
 
-// Stripe Webhook
+// Stripe Webhook Handler
 app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
 
   try {
+    // Verify webhook signature
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
     res.status(400).send(`Webhook Error: ${err.message}`);
     return;
   }
 
+  // Handle successful checkout
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     try {
       console.log('Payment successful:', session.id);
-      // Here you can add additional logic for successful payments
+      // Additional post-payment processing can be added here
     } catch (error) {
       console.error('Webhook processing error:', error);
     }
@@ -406,7 +442,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   res.json({ received: true });
 });
 
-// Error handling middleware
+// Global Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ 
@@ -415,19 +451,18 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Admin dashboard route
+// Admin Dashboard Route
 app.get('/api/admin/dashboard', verifyAdmin, (req, res) => {
   res.json({ message: 'Admin dashboard data' });
 });
 
-// The "catch-all" handler: for any request that doesn't
-// match one above, send back React's index.html file.
+// Catch-all Route for React Single Page Application
 app.get('*', (req, res) => {
-  // Don't redirect API calls
+  // Prevent redirecting API calls
   if (!req.url.startsWith('/api/')) {
     res.sendFile(path.join(__dirname, '../client/build/index.html'));
   } else {
-    // If it's an API call that wasn't matched, send 404
+    // Return 404 for unmatched API routes
     res.status(404).json({ error: 'API route not found' });
   }
 });
@@ -438,7 +473,7 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// Graceful shutdown
+// Graceful Shutdown Handler
 process.on('SIGTERM', () => {
   console.log('SIGTERM signal received: closing HTTP server');
   app.close(() => {
