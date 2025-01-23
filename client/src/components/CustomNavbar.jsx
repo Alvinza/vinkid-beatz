@@ -7,15 +7,20 @@ import SearchOverlay from "./SearchOverlay";
 import logo from "../assets/logo.png";
 
 const CustomNavbar = () => {
+  // Access user context and navigation hook
   const { user, isAdmin, logout } = useContext(UserContext);
   const navigate = useNavigate();
+
+  // State for controlling search overlay visibility
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  // Logout handler: clear user context and redirect to login
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
+  // Styles for navigation links
   const navLinkStyle = {
     color: "white",
     textDecoration: "none",
@@ -25,20 +30,27 @@ const CustomNavbar = () => {
     color: "#007bff",
   };
 
+  // Navigate to cart page
   const cartPage = () => {
     navigate('/cart')
   }
 
   return (
     <>
+      {/* Navbar with fixed positioning and black background */}
       <div style={{ padding: "3rem" }}>
         <Navbar bg="black" expand="lg" className="p-4 fixed-top navbar-dark">
           <Container>
+            {/* Brand logo linking to home page */}
             <Navbar.Brand as={Link} to="/">
               <img src={logo} alt="logo" style={{ width: "70px" }} />
             </Navbar.Brand>
+            
+            {/* Responsive navbar toggle */}
             <Navbar.Toggle aria-controls="basic-navbar-nav" className="custom-toggler" />
+            
             <Navbar.Collapse id="basic-navbar-nav">
+              {/* Navigation links with hover effects */}
               <Nav className="mx-auto" style={{ gap: "1.5rem" }}>
                 <Nav.Link
                   as={Link}
@@ -92,8 +104,7 @@ const CustomNavbar = () => {
                 >
                   Contact
                 </Nav.Link>
-
-{user && isAdmin && (
+                {user && isAdmin && (
   <Nav.Link
     as={Link}
     to="/admin-panel"
