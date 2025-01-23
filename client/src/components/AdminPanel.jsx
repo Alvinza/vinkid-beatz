@@ -1,8 +1,6 @@
 import React from "react";
-
 import BeatUploadForm from "./BeatUploadForm";
 import BeatsDashboard from "./BeatsDashboard";
-
 
 const AdminPanel = () => {
 
