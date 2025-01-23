@@ -1,12 +1,16 @@
 import React, { useEffect } from "react";
+// Import cart context hook
 import { useCart } from "./CartContext";
+// Import routing utility for navigation
 import { useNavigate } from "react-router-dom";
 
 function Cart() {
+  // Extract cart-related functions from context
   const { cart, removeFromCart } = useCart();
+  // Initialize navigation hook
   const navigate = useNavigate();
 
-  // Debug logging
+  // Debug logging for cart items and their images
   useEffect(() => {
     console.log('Current cart items:', cart);
     cart.forEach(beat => {
@@ -14,20 +18,22 @@ function Cart() {
     });
   }, [cart]);
 
+  // Function to handle image rendering with robust URL handling
   const renderImage = (beat) => {
-    // First try the direct URL
+    // Start with the original picture URL
     let imageUrl = beat.picture;
     
-    // If it starts with /uploads, prepend the backend URL
+    // If image path starts with /uploads, prepend backend URL
     if (beat.picture?.startsWith('/uploads')) {
       imageUrl = `https://vinkid-beatz-backend.onrender.com${beat.picture}`;
     }
     
-    // If it's a relative URL without /uploads, still try with the backend URL
+    // Handle other relative URLs by constructing full path
     if (beat.picture && !beat.picture.startsWith('http') && !beat.picture.startsWith('/uploads')) {
       imageUrl = `https://vinkid-beatz-backend.onrender.com/uploads/${beat.picture}`;
     }
-
+    
+    // Return image with error handling
     return (
       <img
         className="w-24 h-24 object-cover rounded"
@@ -49,14 +55,19 @@ function Cart() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
       
+      {/* Render cart contents or empty cart message */}
       {cart.length > 0 ? (
         <div className="space-y-6">
+          {/* Map through cart items */}
           {cart.map((beat) => (
             <div 
               key={beat._id} 
               className="flex items-center gap-6 bg-white p-4 rounded-lg shadow"
             >
+              {/* Render beat image */}
               {renderImage(beat)}
+              
+              {/* Beat details */}
               <div className="flex-grow">
                 <h2 className="text-xl font-semibold">{beat.title}</h2>
                 <p className="text-gray-600">Genre: {beat.genre}</p>
@@ -65,6 +76,8 @@ function Cart() {
                 {/* Debug info - remove in production */}
                 <p className="text-xs text-gray-400 break-all">Image path: {beat.picture}</p>
               </div>
+              
+              {/* Remove from cart button */}
               <button
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                 onClick={() => removeFromCart(beat._id)}
@@ -73,7 +86,8 @@ function Cart() {
               </button>
             </div>
           ))}
-
+          
+          {/* Cart summary and action buttons */}
           <div className="mt-8 flex justify-between items-center">
             <div className="text-xl font-bold">
               Total: ${cart.reduce((sum, beat) => sum + beat.price, 0).toFixed(2)}
@@ -95,6 +109,7 @@ function Cart() {
           </div>
         </div>
       ) : (
+        // Empty cart message and call-to-action
         <div className="text-center py-12">
           <p className="text-xl text-gray-600 mb-4">Your cart is empty.</p>
           <button
@@ -108,5 +123,4 @@ function Cart() {
     </div>
   );
 }
-
 export default Cart;
