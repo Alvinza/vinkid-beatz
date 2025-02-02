@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-// Import routing utility for redirecting
 import { Navigate } from "react-router-dom";
 // Import user context for authentication
 import { UserContext } from "./UserContext";
