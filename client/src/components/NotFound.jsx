@@ -1,5 +1,4 @@
 import React from "react";
-// Import navigation hook from react-router
 import { useNavigate } from "react-router-dom";
 
 const NotFound = () => {
