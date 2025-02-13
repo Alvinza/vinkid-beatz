@@ -6,10 +6,8 @@ import {
   faFacebook,
   faYoutube,
 } from "@fortawesome/free-brands-svg-icons";
-// Importing profile picture
 import pic from "../assets/pic1.jpg";
-// Importing motion library for animation
-import { motion } from "motion/react";
+import { motion } from "motion/react"; // Importing motion library for animation
 
 const About = () => {
   return (
