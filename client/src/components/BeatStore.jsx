@@ -14,7 +14,6 @@ import { useCart } from "./CartContext";
 import { toast } from "react-toastify";
 import GenreSelector from './GenreSelector';
 
-// Main component for the beat store page
 function BeatStore() {
   // State management for various features
   const { addToCart } = useCart();
@@ -154,7 +153,7 @@ function BeatStore() {
   };
 
   return (
-    // Main container with animation
+ 
     <motion.div
       initial={{ opacity: 0, y: 100 }}
       transition={{ duration: 2 }}
