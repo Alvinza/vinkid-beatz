@@ -138,7 +138,7 @@ function BeatUploadForm() {
         <h2 className="text-white text-2xl font-bold mb-6">Upload Beat</h2>
         <form onSubmit={handleSubmit} className="beat-upload-form space-y-4">
           <div className="form-group">
-            // title input
+            {/* title input  */}
             <input
               type="text"
               name="title"
@@ -151,7 +151,7 @@ function BeatUploadForm() {
           </div>
 
           <div className="form-group">
-            // bpm input
+            {/* bpm input */}
             <input
               type="number"
               name="bpm"
@@ -165,7 +165,7 @@ function BeatUploadForm() {
           </div>
 
           <div className="form-group">
-            // price input
+            {/* price input */}
             <input
               type="number"
               name="price"
@@ -193,7 +193,7 @@ function BeatUploadForm() {
           </div>
           
           <div className="form-group">
-            // picture input field
+            {/* picture input field */}
             <label className="block text-white mb-2">
               Cover Image {uploadProgress.picture > 0 && `(${uploadProgress.picture}%)`}
             </label>
@@ -208,7 +208,7 @@ function BeatUploadForm() {
           </div>
           
           <div className="form-group">
-            // audio/ beat input field
+            {/* audio/ beat input field */}
             <label className="block text-white mb-2">
               Audio File {uploadProgress.audio > 0 && `(${uploadProgress.audio}%)`}
             </label>
