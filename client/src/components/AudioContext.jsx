@@ -1,6 +1,6 @@
 import React, { createContext, useState, useRef } from "react";
 
-// Create context for managing audio playback state
+// context for managing audio playback state
 export const AudioContext = createContext();
 
 // Provider component to manage audio-related state and functions
