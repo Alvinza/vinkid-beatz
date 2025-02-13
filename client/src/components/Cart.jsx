@@ -1,14 +1,13 @@
 import React, { useEffect } from "react";
-// Import cart context hook
-import { useCart } from "./CartContext";
-// Import routing utility for navigation
-import { useNavigate } from "react-router-dom";
+import { useCart } from "./CartContext"; // Import cart context hook
+import { useNavigate } from "react-router-dom"; // Import routing utility for navigation
 
 function Cart() {
+  
   // Extract cart-related functions from context
   const { cart, removeFromCart } = useCart();
-  // Initialize navigation hook
-  const navigate = useNavigate();
+
+  const navigate = useNavigate();   // Initialize navigation hook
 
   // Debug logging for cart items and their images
   useEffect(() => {
