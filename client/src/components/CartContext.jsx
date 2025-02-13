@@ -1,7 +1,5 @@
 import React, { createContext, useReducer, useContext } from 'react';
-// Import user context for authentication check
-import { useUser } from './UserContext';
-// Import toast for notifications
+import { useUser } from './UserContext'; // Import user context for authentication check
 import { toast } from 'react-toastify';
 
 // Create context for cart management
