@@ -1,10 +1,7 @@
 import React from 'react'
-// Import toast for notifications
 import { toast } from 'react-toastify';
-// Import toast styles
-import 'react-toastify/dist/ReactToastify.css';
-// Import motion for animation
-import { motion } from "motion/react"
+import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
+import { motion } from "motion/react" // Import motion for animation
 
 const Contact = () => {
     // State to manage form submission result
