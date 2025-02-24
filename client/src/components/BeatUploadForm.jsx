@@ -180,7 +180,7 @@ function BeatUploadForm() {
           </div>
 
           <div className="form-group">
-            // genre input
+            {/* genre input */}
             <input
               type="text"
               name="genre"
