@@ -34,7 +34,7 @@ const About = () => {
         {/* About section with responsive text sizing */}
         <div className="space-y-4 text-center px-4">
           <p className="text-black text-base sm:text-lg lg:text-xl">
-            Hi, I'm Vinkid Beatz, a 21-year-old music producer from South Africa,
+            Hi, I'm Vinkid Beatz, a 22-year-old music producer from South Africa,
             Cape Town. This is your ultimate destination for high-quality,
             professionally crafted beats designed to inspire creativity and take
             your projects to the next level.
