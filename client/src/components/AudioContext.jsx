@@ -17,7 +17,7 @@ export const AudioProvider = ({ children }) => {
   // State to track the current beat being played
   const [currentBeat, setCurrentBeat] = useState(null);
 
-  // Function to play an audio beat
+  // play an audio beat
   const playAudio = (beat, index) => {
     // Update audio source if different from current source
     if (audioRef.current.src !== `https://vinkid-beatz-backend.onrender.com${beat.audio}`) {
