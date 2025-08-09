@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { useCart } from "./CartContext"; // Import cart context hook
-import { useNavigate } from "react-router-dom"; // Import routing utility for navigation
+import { useCart } from "./CartContext"; // cart context hook
+import { useNavigate } from "react-router-dom"; //  routing for navigation
 
 function Cart() {
   
@@ -32,7 +32,6 @@ function Cart() {
       imageUrl = `https://vinkid-beatz-backend.onrender.com/uploads/${beat.picture}`;
     }
     
-    // Return image with error handling
     return (
       <img
         className="w-24 h-24 object-cover rounded"
