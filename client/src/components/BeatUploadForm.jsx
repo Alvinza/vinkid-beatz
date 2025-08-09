@@ -3,13 +3,16 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 function BeatUploadForm() {
+  // Form field states
   const [formData, setFormData] = useState({
     title: '',
     bpm: '',
     price: '',
     genre: '',
   });
+  // File states for picture and audio
   const [files, setFiles] = useState({ picture: null, audio: null });
+  // Upload loading and progress states
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ picture: 0, audio: 0 });
 
@@ -17,6 +20,7 @@ function BeatUploadForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle file input changes with validation
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -27,13 +31,13 @@ function BeatUploadForm() {
         return;
       }
       
-      // Validate file types
+      // Validate image types
       if (e.target.name === 'picture' && !file.type.startsWith('image/')) {
         toast.error('Please select a valid image file');
         e.target.value = '';
         return;
       }
-      
+      // Validate audio type
       if (e.target.name === 'audio' && !file.type.startsWith('audio/')) {
         toast.error('Please select a valid audio file');
         e.target.value = '';
@@ -44,6 +48,7 @@ function BeatUploadForm() {
     }
   };
 
+  // Upload file to Cloudinary and return the URL
   const uploadToCloudinary = async (file, type) => {
     const data = new FormData();
     data.append('file', file);
