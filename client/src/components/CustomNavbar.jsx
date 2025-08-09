@@ -32,8 +32,8 @@ const CustomNavbar = () => {
 
   // Navigate to cart page
   const cartPage = () => {
-    navigate('/cart')
-  }
+    navigate("/cart");
+  };
 
   return (
     <>
@@ -45,10 +45,13 @@ const CustomNavbar = () => {
             <Navbar.Brand as={Link} to="/">
               <img src={logo} alt="logo" style={{ width: "70px" }} />
             </Navbar.Brand>
-            
+
             {/* Responsive navbar toggle */}
-            <Navbar.Toggle aria-controls="basic-navbar-nav" className="custom-toggler" />
-            
+            <Navbar.Toggle
+              aria-controls="basic-navbar-nav"
+              className="custom-toggler"
+            />
+
             <Navbar.Collapse id="basic-navbar-nav">
               {/* Navigation links with hover effects */}
               <Nav className="mx-auto" style={{ gap: "1.5rem" }}>
@@ -105,78 +108,78 @@ const CustomNavbar = () => {
                   Contact
                 </Nav.Link>
                 {user && isAdmin && (
-  <Nav.Link
-    as={Link}
-    to="/admin-panel"
-    style={navLinkStyle}
-    className="text-gray-400"
-    onMouseOver={(e) =>
-      (e.currentTarget.style.color = navLinkHoverStyle.color)
-    }
-    onMouseOut={(e) =>
-      (e.currentTarget.style.color = navLinkStyle.color)
-    }
-  >
-    Admin Panel
-  </Nav.Link>
-)}
-</Nav>
+                  <Nav.Link
+                    as={Link}
+                    to="/admin-panel"
+                    style={navLinkStyle}
+                    className="text-gray-400"
+                    onMouseOver={(e) =>
+                      (e.currentTarget.style.color = navLinkHoverStyle.color)
+                    }
+                    onMouseOut={(e) =>
+                      (e.currentTarget.style.color = navLinkStyle.color)
+                    }
+                  >
+                    Admin Panel
+                  </Nav.Link>
+                )}
+              </Nav>
 
-<div className="d-flex navIcons">
-{user ? (
-  <>
-    <span className="text-white me-3">
-      Welcome, {user.name}
-    </span>
-    <Button
-      variant="outline-secondary"
-      className="text-white"
-      onClick={handleLogout}
-      style={{ marginRight: "10px" }}
-    >
-      Logout
-    </Button>
-  </>
-) : (
-  <>
-    <Link to="/login">
-      <Button
-        variant="outline-secondary"
-        className="me-2 text-white"
-      >
-        Login
-      </Button>
-    </Link>
-  </>
-)}
+              <div className="d-flex navIcons">
+                {user ? (
+                  <>
+                    <span className="text-white me-3">
+                      Welcome, {user.name}
+                    </span>
+                    <Button
+                      variant="outline-secondary"
+                      className="text-white"
+                      onClick={handleLogout}
+                      style={{ marginRight: "10px" }}
+                    >
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login">
+                      <Button
+                        variant="outline-secondary"
+                        className="me-2 text-white"
+                      >
+                        Login
+                      </Button>
+                    </Link>
+                  </>
+                )}
 
-<Button
-  onClick={cartPage}
-  variant="outline-secondary"
-  className="me-2 text-white"
->
-  <FaShoppingCart />
-</Button>
+                <Button
+                  onClick={cartPage}
+                  variant="outline-secondary"
+                  className="me-2 text-white"
+                >
+                  <FaShoppingCart />
+                </Button>
 
-<Button
-  variant="outline-secondary"
-  className="me-2 text-white"
-  onClick={() => setIsSearchOpen(true)}
->
-  <FaSearch />
-</Button>
-</div>
-</Navbar.Collapse>
-</Container>
-</Navbar>
-</div>
+                <Button
+                  variant="outline-secondary"
+                  className="me-2 text-white"
+                  onClick={() => setIsSearchOpen(true)}
+                >
+                  <FaSearch />
+                </Button>
+              </div>
+            </Navbar.Collapse>
+          </Container>
+        </Navbar>
+      </div>
 
-<SearchOverlay
-isOpen={isSearchOpen}
-onClose={() => setIsSearchOpen(false)}
-/>
-</>
-);
+      <SearchOverlay
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
+    </>
+  );
 };
 
 export default CustomNavbar;
