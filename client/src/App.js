@@ -1,12 +1,9 @@
 import React from 'react';
-// Import global and third-party stylesheets
 import './App.css';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-// Import routing components from react-router-dom
 import { Route, Routes } from 'react-router-dom';
 
 // Import custom components and context providers
@@ -39,12 +36,12 @@ function App() {
             {/* Toast notification container for displaying alerts */}
             <ToastContainer />
 
-            {/* Global navigation component */}
+            {/* navigation component */}
             <CustomNavbar />
 
-            {/* Define application routing configuration */}
+            {/* Define application routing */}
             <Routes>
-              {/* Public routes */}
+              {/* routes */}
               <Route path="/beats" element={<BeatStore />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
