@@ -5,9 +5,8 @@ import { useCart } from './CartContext';
 const Success = () => {
   // Access cart clearing function from CartContext
   const { clearCart } = useCart();
-
-  // Navigation hook for routing
-  const navigate = useNavigate();
+  
+  const navigate = useNavigate();   // Navigation hook for routing
 
   useEffect(() => {
     // Automatically clear the cart when the success page is loaded
@@ -17,10 +16,7 @@ const Success = () => {
 
   return (
     <div className="max-w-md mx-auto mt-24 p-6 bg-white rounded-lg shadow-lg text-center">
-      {/* Success message with celebratory emojis */}
       <h1 className="text-3xl font-bold text-green-600 mb-4">Payment Successful! 🎉🎉</h1>
-      
-      {/* Confirmation message */}
       <p className="text-gray-600 mb-6">Thank you for your purchase.</p>
       
       {/* Button to return to beats store */}
