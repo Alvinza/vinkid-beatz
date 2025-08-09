@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from './CartContext'; // Update import path
+import { useCart } from './CartContext'; // Import cart context hook
 
 function CartPage() {
   const { cart, removeFromCart, clearCart } = useCart();
