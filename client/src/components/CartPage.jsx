@@ -6,6 +6,7 @@ function CartPage() {
   const { cart, removeFromCart, clearCart } = useCart();
   const navigate = useNavigate();
 
+  // Calculate total cart price
   const totalPrice = cart.reduce((sum, item) => sum + item.price, 0);
 
   const handleBuy = () => {
@@ -15,6 +16,7 @@ function CartPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
+      {/* Show empty cart message */}
       {cart.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-xl text-gray-600">Your cart is empty!</p>
@@ -27,6 +29,7 @@ function CartPage() {
         </div>
       ) : (
         <div>
+          {/* List cart items */}
           <div className="space-y-4">
             {cart.map((item) => (
               <div 
@@ -45,6 +48,7 @@ function CartPage() {
                     <p className="text-blue-600 font-semibold">${item.price}</p>
                   </div>
                 </div>
+                {/* Remove item button */}
                 <button
                   onClick={() => removeFromCart(item._id)}
                   className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300"
@@ -55,6 +59,7 @@ function CartPage() {
             ))}
           </div>
 
+           {/* Total price & actions */}
           <div className="mt-8 border-t pt-4">
             <div className="flex justify-between items-center mb-4">
               <span className="text-xl font-semibold">Total:</span>
@@ -62,6 +67,7 @@ function CartPage() {
             </div>
             
             <div className="flex space-x-4 justify-end">
+              {/* Clear all items */}
               <button
                 onClick={clearCart}
                 className="btn btn-outline-secondary transition duration-300"
