@@ -1,16 +1,22 @@
 import React, { useState, useContext } from 'react';
-import { UserContext } from './UserContext';
+import { UserContext } from './UserContext'; // Global user state/context
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const AdminLogin = () => {
+  // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Error & loading state
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Error & loading state
   const { login } = useContext(UserContext);
   const navigate = useNavigate();
 
+  // Handle login form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -26,7 +32,8 @@ const AdminLogin = () => {
       );
 
       const { name, isAdmin, token } = response.data;
-      
+
+       // Prevent non-admin access
       if (!isAdmin) {
         setError('This account does not have admin privileges');
         return;
@@ -40,7 +47,8 @@ const AdminLogin = () => {
       
       // Update user context
       login({ name, email, isAdmin, token });
-      
+
+      // Redirect to admin dashboard
       navigate('/admin-panel');
     } catch (error) {
       console.error('Login error:', error);
