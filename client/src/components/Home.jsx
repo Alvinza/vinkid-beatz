@@ -10,7 +10,6 @@ const Home = () => {
 
   // Handle search form submission
   const handleSearch = (e) => {
-    // Prevents default form submission behavior
     e.preventDefault();
     
     // Navigate to beats page with search query if not empty
@@ -28,7 +27,6 @@ const Home = () => {
     // Hero section with search functionality
     <div className="hero">
       <div className="hero-text container">
-        {/* Main heading */}
         <h1 className="hero-title">High Quality Beats!</h1>
         
         {/* Search form */}
@@ -46,8 +44,7 @@ const Home = () => {
             <i className="fas fa-search"></i>
           </button>
         </form>
-        
-        {/* Explore more button */}
+ 
         <div className="home-button">
           <button onClick={homePage} style={{marginLeft: "2rem"}}>
             Explore More
