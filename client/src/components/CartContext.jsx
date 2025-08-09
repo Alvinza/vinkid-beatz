@@ -1,14 +1,14 @@
 import React, { createContext, useReducer, useContext } from 'react';
-import { useUser } from './UserContext'; // Import user context for authentication check
+import { useUser } from './UserContext'; // user context for authentication check
 import { toast } from 'react-toastify';
 
-// Create context for cart management
+// Creating context for cart management
 const CartContext = createContext();
 
 // Reducer function to manage cart state
 const cartReducer = (state, action) => {
   switch (action.type) {
-    // Add item to cart if not already present
+    // Add item to cart 
     case 'ADD_TO_CART':
       if (state.find(item => item._id === action.payload._id)) {
         return state;
