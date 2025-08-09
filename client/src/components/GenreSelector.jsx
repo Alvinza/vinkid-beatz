@@ -1,5 +1,4 @@
 import React from 'react';
-
 // Genre selector component for filtering beats
 const GenreSelector = ({ selectedGenre, setSelectedGenre }) => {
   // Predefined list of music genres
