@@ -1,7 +1,7 @@
 import React from 'react'
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
-import { motion } from "motion/react" // Import motion for animation
+import 'react-toastify/dist/ReactToastify.css'; 
+import { motion } from "motion/react" // motion for animation
 
 const Contact = () => {
     // State to manage form submission result
@@ -9,15 +9,13 @@ const Contact = () => {
 
     // Handle form submission
     const onSubmit = async (event) => {
-        // Prevent default form submission
-        event.preventDefault();
-        
+        event.preventDefault();     
         // Set loading state
         setResult("Sending....");
         
         // Create form data
         const formData = new FormData(event.target);
-        // Add access key for Web3Forms
+        // access key for Web3Forms
         formData.append("access_key", "ac0ea1e3-87c3-4016-8df4-9f62d0403230");
         
         // Submit form data to Web3Forms
