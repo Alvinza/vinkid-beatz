@@ -5,15 +5,17 @@ const BeatsDashboard = () => {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
 
+  // Fetch beats when component mounts
   useEffect(() => {
     fetchBeats();
   }, []);
 
+  // Retrieve stored authentication token for API requests
   const getAuthToken = () => {
-    // Get the token from localStorage or wherever you store it after login
     return localStorage.getItem('token');
   };
 
+  // Fetch all beats from backend
   const fetchBeats = async () => {
     try {
       const response = await fetch('https://vinkid-beatz-backend.onrender.com/api/beats');
@@ -24,11 +26,13 @@ const BeatsDashboard = () => {
     }
   };
 
+  // Enable edit mode for a specific beat
   const handleEdit = (beat) => {
     setEditingId(beat._id);
     setEditForm({ ...beat });
   };
 
+   // Save updated beat details to backend
   const handleUpdate = async (id) => {
     try {
       const token = getAuthToken();
