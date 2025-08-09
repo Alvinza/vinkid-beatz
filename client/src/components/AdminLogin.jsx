@@ -64,7 +64,8 @@ const AdminLogin = () => {
         <div>
           <h2 className="text-center text-3xl font-bold text-gray-900">Admin Login</h2>
         </div>
-        
+
+        {/* Login Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
             <div className="p-3 text-sm text-red-600 bg-red-100 rounded">
