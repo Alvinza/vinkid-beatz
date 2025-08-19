@@ -60,6 +60,7 @@ The application consists of **9 main pages**, accessible through a user-friendly
 ### Building this Beat Store came with challenges:
  - **Stripe Integration**: Learning how to manage API keys and webhooks was tricky. I solved it by carefully following the Stripe docs and testing in "test mode."
  - **File Uploads**: Handling beat uploads was challenging, but I used multer and express.static to manage and serve files properly.
+ - **Admin Login Issues:**: Setting up the admin login was another challenge. At first, my logic didn’t properly differentiate between normal users and admins. I overcame this by adding an isAdmin flag in the database, handling it in the backend with middleware, and restricting routes/features based on that role.
  - **Styling Conflicts**: Tailwind and Bootstrap sometimes overlapped. I fixed this by restricting Bootstrap usage only to buttons and leaving layouts to Tailwind.
  - **Deployment on Render**: Environment variables caused issues initially. I solved this by properly setting up MONGO_URI, JWT_SECRET, and STRIPE_SECRET_KEY in Render’s dashboard.
  - **Authentication Flow**: JWT tokens weren’t stored/validated correctly at first. I fixed it by using localStorage in React and middleware on the backend for validation.
