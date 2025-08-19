@@ -2,7 +2,7 @@
 
 This application is a modern and user-friendly beat/music store built using the **MERN Stack** technologies. It allows users to browse, play, and purchase beats seamlessly.  
 
- **🌐**: [Live link](https://vinkid-beatz.onrender.com/)  
+ **🌐** [Live link](https://vinkid-beatz.onrender.com/)  
 📧 **Contact Me**: alvinzondi09@gmail.com  
 
 ---
