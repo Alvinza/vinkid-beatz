@@ -2,12 +2,22 @@
 
 This application is a modern and user-friendly beat/music store built using the **MERN Stack** technologies. It allows users to browse, play, and purchase beats seamlessly.
 
+🌐 **Live Demo**: [Beat Store on Render](https://vinkid-beatz.onrender.com/)  
+
+📧 **Contact Me**: alvinzondi09@gmail.com  
+
+---
+
 ## Features
 
 - **Play Beats**: Users can preview beats directly on the website.
 - **User Authentication**: Login and register functionalities for a personalized experience.
 - **Purchase Beats**: Secure checkout process using **Stripe**.
-- **Responsive Design**: The app is accessible on various devices.
+- **Responsive Design**: Fully optimized for various devices.
+- **Tailwind CSS Styling**: Clean, modern UI built with Tailwind for layout and components.
+- **Bootstrap Buttons**: Buttons styled with Bootstrap for consistency and simplicity.
+
+---
 
 ## How to Use the Application
 
@@ -16,9 +26,11 @@ This application is a modern and user-friendly beat/music store built using the 
 3. **Login**: Existing users can log in to access additional features, such as purchasing beats.
 4. **Purchase Beats**: Add desired beats to the cart and proceed to checkout via Stripe for secure payment.
 
+---
+
 ## Navigation
 
-The application consists of 9 pages, accessible through a user-friendly navigation bar:
+The application consists of **9 main pages**, accessible through a user-friendly navigation bar:
 
 - **Home**: Overview of the beat store.
 - **Beats**: Browse and play available beats.
@@ -30,6 +42,8 @@ The application consists of 9 pages, accessible through a user-friendly navigati
 - **Contact**: Reach out for support or inquiries.
 - **About**: Learn more about the application.
 
+---
+
 ## Technologies Used
 
 - **MongoDB**: Database for storing user data and beat information.
@@ -37,3 +51,7 @@ The application consists of 9 pages, accessible through a user-friendly navigati
 - **React.js**: Frontend library for creating an interactive user interface.
 - **Node.js**: Runtime environment for executing server-side JavaScript.
 - **Stripe**: Secure payment gateway for processing transactions.
+- **Tailwind CSS**: Utility-first CSS framework for modern styling.
+- **Bootstrap**: Used specifically for button components.
+
+---
