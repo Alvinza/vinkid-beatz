@@ -55,3 +55,13 @@ The application consists of **9 main pages**, accessible through a user-friendly
 - **Bootstrap**: Used specifically for button components.
 
 ---
+
+### Challenges I Faced & How I Overcame Them
+- Building this Beat Store came with a few challenges:
+ - **Stripe Integration**: Learning how to manage API keys and webhooks was tricky. I solved it by carefully following the Stripe docs and testing in "test mode."
+ - **File Uploads**: Handling beat uploads was challenging, but I used multer and express.static to manage and serve files properly.
+ - **Styling Conflicts**: Tailwind and Bootstrap sometimes overlapped. I fixed this by restricting Bootstrap usage only to buttons and leaving layouts to Tailwind.
+ - **Deployment on Render**: Environment variables caused issues initially. I solved this by properly setting up MONGO_URI, JWT_SECRET, and STRIPE_SECRET_KEY in Render’s dashboard.
+ - **Authentication Flow**: JWT tokens weren’t stored/validated correctly at first. I fixed it by using localStorage in React and middleware on the backend for validation.
+ - **Audio Controls Across Pages**: One major issue was keeping the audio player state when navigating between pages. Initially, playback stopped when switching routes. I solved this by implementing Redux for global state management, which allowed the audio controls to persist across pages.
+ - These challenges taught me how to debug effectively, read documentation carefully, and design features that work smoothly across the full stack.
