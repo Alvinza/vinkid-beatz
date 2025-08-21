@@ -203,7 +203,7 @@ function BeatStore() {
                 No beats found
               </h2>
               <p className="text-gray-500 mt-2">
-                Try adjusting your search or browse our other beats
+                Please wait a moment...Or try adjusting your search
               </p>
             </div>
           ) : (
