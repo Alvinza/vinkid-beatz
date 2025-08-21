@@ -22,7 +22,7 @@ function CartPage() {
           <p className="text-xl text-gray-600">Your cart is empty!</p>
           <button 
             onClick={() => navigate('/beats')}
-            className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+            className="mt-4 btn btn btn-primary"
           >
             Browse Beats
           </button>
@@ -51,7 +51,7 @@ function CartPage() {
                 {/* Remove item button */}
                 <button
                   onClick={() => removeFromCart(item._id)}
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300"
+                  className="btn btn-danger"
                 >
                   Remove
                 </button>
@@ -70,7 +70,7 @@ function CartPage() {
               {/* Clear all items */}
               <button
                 onClick={clearCart}
-                className="btn btn-outline-secondary transition duration-300"
+                className="btn btn-outline-primary"
               >
                 Clear Cart
               </button>
