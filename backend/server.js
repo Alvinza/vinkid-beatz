@@ -385,7 +385,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
           currency: 'usd',
           product_data: {
             name: beat.title,
-            images: ${beat.picture},
+            images: beat.picture ? [beat.picture] : [],
             description: `${beat.genre} beat - ${beat.bpm} BPM`,
           },
           unit_amount: Math.round(beat.price * 100),
