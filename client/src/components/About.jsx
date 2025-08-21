@@ -37,7 +37,7 @@ const About = () => {
             Hi, I'm Vinkid Beatz, a 22-year-old music producer from South Africa,
             Cape Town. This is your ultimate destination for high-quality,
             professionally crafted beats designed to inspire creativity and take
-            your projects to the next level. Take care
+            your projects to the next level. 
           </p>
           <p className="text-black text-base sm:text-lg lg:text-xl">
             Whether you're an artist, content creator, or filmmaker, I've got the
