@@ -76,7 +76,7 @@ function CartPage() {
               </button>
               <button
                 onClick={handleBuy}
-                className="bg-green-600 text-white px-8 py-2 rounded-lg hover:bg-green-700 transition duration-300"
+                className="btn btn-primary ml-2"
               >
                 Proceed to Buy
               </button>
