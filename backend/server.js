@@ -12,20 +12,11 @@ const beatRoutes = require("./routes/beatRoutes");
 const { verifyAdmin } = require("./middleware/authMiddleware");
 const bcrypt = require('bcryptjs'); // Password hashing library
 const User = require('./models/User');
-const cloudinary = require('cloudinary').v2; // Cloud storage for media files
-
 
 // Initialize Express application
 const app = express();
 // Initialize Stripe with secret key from environment variables
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-
-// Configure Cloudinary for cloud file storage
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
 
 // Middleware setup
 app.use(express.json()); // Parse JSON request bodies
@@ -34,8 +25,7 @@ app.use(cors({
   credentials: true // Allow credentials (cookies, authorization headers)
 }));
 
-
-
+// Routes
 app.use("/api", authRoutes); // Include authentication routes
 app.use("/api/beats", beatRoutes);  // beats CRUD (upload, search, update, delete)
 
