@@ -9,7 +9,9 @@ const jwt = require('jsonwebtoken'); // JSON Web Token implementation
 const authRoutes = require("./routes/authRoutes"); // Custom authentication routes
 const beatRoutes = require("./routes/beatRoutes");
 const bcrypt = require('bcryptjs'); // Password hashing library
+const User = require('./models/User');
 const cloudinary = require('cloudinary').v2; // Cloud storage for media files
+
 
 // Initialize Express application
 const app = express();
