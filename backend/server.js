@@ -6,8 +6,10 @@ const cors = require('cors'); // Cross-Origin Resource Sharing middleware
 const path = require('path'); // File path utility
 const Stripe = require('stripe'); // Payment processing library
 const jwt = require('jsonwebtoken'); // JSON Web Token implementation
+
 const authRoutes = require("./routes/authRoutes"); // Custom authentication routes
 const beatRoutes = require("./routes/beatRoutes");
+const { verifyAdmin } = require("./middleware/authMiddleware");
 const bcrypt = require('bcryptjs'); // Password hashing library
 const User = require('./models/User');
 const cloudinary = require('cloudinary').v2; // Cloud storage for media files
@@ -81,33 +83,6 @@ mongoose
     initializeAdmin(); // Create admin user if not exists
   })
   .catch((err) => console.error('Error connecting to MongoDB:', err));
-
-
-// Middleware to verify admin authentication
-const verifyAdmin = async (req, res, next) => {
-  try {
-    // Extract token from Authorization header
-    const token = req.headers.authorization?.split(' ')[1];
-    
-    if (!token) {
-      return res.status(401).json({ message: 'No token provided' });
-    }
-
-    // Verify JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Check admin status
-    if (!decoded.isAdmin) {
-      return res.status(403).json({ message: 'Admin access required' });
-    }
-
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: 'Invalid token' });
-  }
-};
-
 
 
 // Stripe Checkout Session Creation Route
