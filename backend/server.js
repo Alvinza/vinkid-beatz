@@ -4,13 +4,10 @@ const express = require('express'); // Web application framework
 const mongoose = require('mongoose'); // MongoDB object modeling tool
 const cors = require('cors'); // Cross-Origin Resource Sharing middleware
 const path = require('path'); // File path utility
-const fs = require('fs'); // File system operations
-const multer = require('multer'); // Middleware for handling multipart/form-data (file uploads)
-const Beat = require('./models/Beat.js'); // Beat model schema
 const Stripe = require('stripe'); // Payment processing library
-const User = require('./models/User.js'); // User model schema
 const jwt = require('jsonwebtoken'); // JSON Web Token implementation
 const authRoutes = require("./routes/authRoutes"); // Custom authentication routes
+const beatRoutes = require("./routes/beatRoutes");
 const bcrypt = require('bcryptjs'); // Password hashing library
 const cloudinary = require('cloudinary').v2; // Cloud storage for media files
 
@@ -18,15 +15,6 @@ const cloudinary = require('cloudinary').v2; // Cloud storage for media files
 const app = express();
 // Initialize Stripe with secret key from environment variables
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-
-// Helper function to normalize file paths for consistent URL generation
-function normalizeFilePath(filePath) {
-  const filename = path.basename(filePath);
-  return `/uploads/${filename}`;
-}
-
-// Serve static files from React build directory
-app.use(express.static(path.join(__dirname, '../client/build')));
 
 // Configure Cloudinary for cloud file storage
 cloudinary.config({
@@ -42,53 +30,10 @@ app.use(cors({
   credentials: true // Allow credentials (cookies, authorization headers)
 }));
 
-// Ensure uploads directory exists for local file storage
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
 
-// File Upload Configuration
-const storage = multer.diskStorage({
-  // Set destination for uploaded files
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  // Generate unique filename for each uploaded file
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
 
-// File type validation for uploads
-const fileFilter = (req, file, cb) => {
-  const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
-  const allowedAudioTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3'];
-  
-  // Validate image uploads
-  if (file.fieldname === 'picture' && allowedImageTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } 
-  // Validate audio uploads  
-  else if (file.fieldname === 'audio' && allowedAudioTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Invalid file type'), false);
-  }
-};
-
-// Configure multer for file uploads
-const upload = multer({
-  storage, // Use custom storage configuration
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB file size limit
-  fileFilter, // Use custom file type validation
-});
-
-// Serve uploaded files statically
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-// Include authentication routes
-app.use("/api", authRoutes);
+app.use("/api", authRoutes); // Include authentication routes
+app.use("/api/beats", beatRoutes);  // beats CRUD (upload, search, update, delete)
 
 // Function to initialize admin user during application startup
 async function initializeAdmin() {
@@ -135,83 +80,6 @@ mongoose
   })
   .catch((err) => console.error('Error connecting to MongoDB:', err));
 
-// User Registration Route
-app.post('/api/register', async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: 'Email already registered' });
-    }
-    // Create new user
-    const newUser = new User({ username, email, password });
-    await newUser.save();
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Registration failed' });
-  }
-});
-
-// User Login Route
-app.post("/api/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    
-    // Find user by email
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    // Special handling for admin login
-    if (email === process.env.ADMIN_EMAIL) {
-      const isEnvPasswordValid = password === process.env.ADMIN_PASSWORD;
-      const isStoredPasswordValid = await bcrypt.compare(password, user.password);
-      
-      // Validate admin password
-      if (!isEnvPasswordValid && !isStoredPasswordValid) {
-        return res.status(401).json({ message: "Invalid admin credentials" });
-      }
-
-      // Ensure admin status
-      if (!user.isAdmin) {
-        user.isAdmin = true;
-        await user.save();
-      }
-    } else {
-      // Regular user password validation
-      const isValidPassword = await bcrypt.compare(password, user.password);
-      if (!isValidPassword) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-    }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      {
-        id: user._id,
-        email: user.email,
-        isAdmin: user.isAdmin
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    // Return user details and token
-    res.status(200).json({
-      name: user.username,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token
-    });
-
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
 
 // Middleware to verify admin authentication
 const verifyAdmin = async (req, res, next) => {
@@ -238,135 +106,7 @@ const verifyAdmin = async (req, res, next) => {
   }
 };
 
-// Beat Routes continue... (fetching, searching, updating, deleting beats)
-app.get('/api/beats', async (req, res) => {
-  try {
-    const beats = await Beat.find();
-    res.json(beats);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch beats' });
-  }
-});
 
-// Search beats by title or genre
-app.get('/api/beats/search', async (req, res) => {
-  const query = req.query.q;
-  try {
-    const beats = await Beat.find({
-      $or: [
-        { title: { $regex: query, $options: 'i' } },
-        { genre: { $regex: query, $options: 'i' } },
-      ],
-    });
-    res.json(beats);
-  } catch (err) {
-    res.status(500).json({ message: 'Error fetching beats' });
-  }
-});
-
-// Fetch beats by specific genre
-app.get('/api/beats/genre/:genre', async (req, res) => {
-  try {
-    const genre = req.params.genre;
-    const beats = await Beat.find({ genre });
-    res.json(beats);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch beats by genre' });
-  }
-});
-
-// Update beat (admin-only)
-app.put('/api/beats/:id', verifyAdmin, async (req, res) => {
-  try {
-    const beatId = req.params.id;
-    const updateData = req.body;
-    
-    const updatedBeat = await Beat.findByIdAndUpdate(
-      beatId,
-      updateData,
-      { new: true }
-    );
-    
-    if (!updatedBeat) {
-      return res.status(404).json({ error: 'Beat not found' });
-    }
-    
-    res.json(updatedBeat);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to update beat' });
-  }
-});
-
-// Delete beat (admin-only)
-app.delete('/api/beats/:id', verifyAdmin, async (req, res) => {
-  try {
-    const beatId = req.params.id;
-    const beat = await Beat.findById(beatId);
-    
-    if (!beat) {
-      return res.status(404).json({ error: 'Beat not found' });
-    }
-    
-    // Delete associated local files
-    if (beat.picture) {
-      const picturePath = path.join(__dirname, beat.picture);
-      if (fs.existsSync(picturePath)) {
-        fs.unlinkSync(picturePath);
-      }
-    }
-    
-    if (beat.audio) {
-      const audioPath = path.join(__dirname, beat.audio);
-      if (fs.existsSync(audioPath)) {
-        fs.unlinkSync(audioPath);
-      }
-    }
-    
-    await Beat.findByIdAndDelete(beatId);
-    res.json({ message: 'Beat deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to delete beat' });
-  }
-});
-// Beat Upload Route (Admin-only)
-app.post('/api/upload-beat', verifyAdmin, async (req, res) => {
-  try {
-    const { title, bpm, price, genre, picture, audio } = req.body;
-    
-    // Validate required fields
-    if (!title || !bpm || !price || !genre) {
-      return res.status(400).json({ error: 'All fields are required!' });
-    }
-
-    // Ensure both media URLs are present
-    if (!picture || !audio) {
-      return res.status(400).json({ error: 'Both picture and audio files are required!' });
-    }
-
-    // Create new beat document
-    const newBeat = new Beat({
-      title,
-      picture, // Cloudinary URL
-      audio,   // Cloudinary URL
-      bpm: Number(bpm),
-      price: Number(price),
-      genre
-    });
-
-    await newBeat.save();
-
-    res.status(201).json({
-      message: 'Beat uploaded successfully!',
-      beat: newBeat
-    });
-  } catch (err) {
-    console.error('Upload error:', err);
-    res.status(500).json({ 
-      error: 'Failed to upload beat',
-      details: err.message 
-    });
-  }
-});
 
 // Stripe Checkout Session Creation Route
 app.post('/api/create-checkout-session', async (req, res) => {
