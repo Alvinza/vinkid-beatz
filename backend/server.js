@@ -3,15 +3,14 @@ require('dotenv').config(); // Load environment variables
 const express = require('express'); // Web application framework
 const mongoose = require('mongoose'); // MongoDB object modeling tool
 const cors = require('cors'); // Cross-Origin Resource Sharing middleware
+const bcrypt = require('bcryptjs'); // Password hashing library
 const path = require('path'); // File path utility
 const Stripe = require('stripe'); // Payment processing library
-const jwt = require('jsonwebtoken'); // JSON Web Token implementation
 
 const authRoutes = require("./routes/authRoutes"); // Custom authentication routes
 const beatRoutes = require("./routes/beatRoutes");
-const { verifyAdmin } = require("./middleware/authMiddleware");
-const bcrypt = require('bcryptjs'); // Password hashing library
 const User = require('./models/User');
+const { verifyAdmin } = require("./middleware/authMiddleware");
 
 // Initialize Express application
 const app = express();
