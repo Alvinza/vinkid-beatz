@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const Beat = require("../models/Beat");
-const { verifyAdmin } = require("../middleware/authMiddleware");
+const { verifyToken, verifyAdmin } = require("../middleware/authMiddleware");
 
 // ========================
 // Get all beats
