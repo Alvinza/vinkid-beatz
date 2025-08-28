@@ -7,14 +7,14 @@ const bcrypt = require('bcryptjs'); // Password hashing library
 const path = require('path'); // File path utility
 const Stripe = require('stripe'); // Payment processing library
 
+// Local Imports
 const authRoutes = require("./routes/authRoutes"); // Custom authentication routes
 const beatRoutes = require("./routes/beatRoutes");
 const User = require('./models/User');
 const { verifyAdmin } = require("./middleware/authMiddleware");
 
-// Initialize Express application
+// Initialize application
 const app = express();
-// Initialize Stripe with secret key from environment variables
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Middleware setup
