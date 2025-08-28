@@ -1,19 +1,18 @@
-// Import required dependencies
-require('dotenv').config(); // Load environment variables
-const express = require('express'); // Web application framework
-const mongoose = require('mongoose'); // MongoDB object modeling tool
-const cors = require('cors'); // Cross-Origin Resource Sharing middleware
-const bcrypt = require('bcryptjs'); // Password hashing library
+// Import dependencies
+require('dotenv').config(); 
+const express = require('express'); 
+const mongoose = require('mongoose');
+const cors = require('cors'); 
+const bcrypt = require('bcryptjs'); 
 const path = require('path'); // File path utility
 const Stripe = require('stripe'); // Payment processing library
 
 // Local Imports
-const authRoutes = require("./routes/authRoutes"); // Custom authentication routes
+const authRoutes = require("./routes/authRoutes"); 
 const beatRoutes = require("./routes/beatRoutes");
 const User = require('./models/User');
 const { verifyAdmin } = require("./middleware/authMiddleware");
 
-// Initialize application
 const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -25,7 +24,7 @@ app.use(cors({
 }));
 
 // Routes
-app.use("/api", authRoutes); // Include authentication routes
+app.use("/api", authRoutes); 
 app.use("/api/beats", beatRoutes);  // beats CRUD (upload, search, update, delete)
 
 // Function to initialize admin user during application startup
