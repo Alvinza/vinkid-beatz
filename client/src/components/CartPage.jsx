@@ -1,3 +1,9 @@
+/**
+ * - Lists all cart items
+ * - Allows removing single item or clearing the cart
+ * - Displays total price
+ * - Navigation to checkout or continue shopping
+ */
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from './CartContext'; // Import cart context hook
