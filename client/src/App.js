@@ -52,7 +52,6 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/faq" element={<Faq />} />
               <Route path="/success" element={<Success />} />
-
               {/* Catch-all route for undefined pages */}
               <Route path="*" element={<NotFound />} />
 
