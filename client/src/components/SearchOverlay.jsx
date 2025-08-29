@@ -1,12 +1,10 @@
+// Displays search results in an overlay popup
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 
 const SearchOverlay = ({ isOpen, onClose }) => {
-  // State to manage search query
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Navigation hook to redirect after search
+  const [searchQuery, setSearchQuery] = useState(''); // manage search query
   const navigate = useNavigate();
 
   const handleSearch = (e) => {
