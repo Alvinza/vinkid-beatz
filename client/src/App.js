@@ -15,16 +15,15 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
 import Faq from './components/Faq';
+import { CartProvider } from './components/CartContext';
 import { AudioProvider } from './components/AudioContext';
 import { UserProvider } from './components/UserContext';
 import AdminRoute from './components/AdminRoute';
-import { CartProvider } from './components/CartContext';
 import Payment from './components/Payment';
 import CartPage from './components/CartPage';
 import Success from './components/Success';
 import NotFound from './components/NotFound';
 import AdminPanel from './components/AdminPanel';
-// import AdminLogin from './components/AdminLogin'; 
 
 function App() {
   return (
@@ -37,7 +36,7 @@ function App() {
             <ToastContainer />
             <CustomNavbar />
 
-            {/* Define application routing */}
+            {/*  application routing */}
             <Routes>
               {/* routes */}
               <Route path="/beats" element={<BeatStore />} />
@@ -52,6 +51,7 @@ function App() {
               <Route path="/success" element={<Success />} />
               {/* Catch-all route for undefined pages */}
               <Route path="*" element={<NotFound />} />
+                
               <Route
                 path="/admin-panel"
                 element={
