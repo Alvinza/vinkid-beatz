@@ -19,6 +19,9 @@ const CustomNavbar = () => {
     logout();
     navigate("/login");
   };
+  const cartPage = () => {
+    navigate("/cart");
+  };
 
   // Styles for navigation links
   const navLinkStyle = {
@@ -28,11 +31,6 @@ const CustomNavbar = () => {
 
   const navLinkHoverStyle = {
     color: "#007bff",
-  };
-
-  // Navigate to cart page
-  const cartPage = () => {
-    navigate("/cart");
   };
 
   return (
@@ -107,6 +105,8 @@ const CustomNavbar = () => {
                 >
                   Contact
                 </Nav.Link>
+                
+                {/* Only visible to admin users */}
                 {user && isAdmin && (
                   <Nav.Link
                     as={Link}
@@ -125,6 +125,7 @@ const CustomNavbar = () => {
                 )}
               </Nav>
 
+              {/* Right-side action buttons */}
               <div className="d-flex navIcons">
                 {user ? (
                   <>
@@ -161,6 +162,7 @@ const CustomNavbar = () => {
                   <FaShoppingCart />
                 </Button>
 
+                {/* Open search overlay */}
                 <Button
                   variant="outline-secondary"
                   className="me-2 text-white"
@@ -174,6 +176,7 @@ const CustomNavbar = () => {
         </Navbar>
       </div>
 
+      {/* Search overlay component */}
       <SearchOverlay
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
