@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-  // State to manage search input
-  const [searchQuery, setSearchQuery] = useState("");
-  
-  // Initialize navigation hook
+  const [searchQuery, setSearchQuery] = useState(""); // manage search input
   const navigate = useNavigate();
 
   // Handle search form submission
@@ -17,8 +14,6 @@ const Home = () => {
       navigate(`/beats?search=${encodeURIComponent(searchQuery)}`);
     }
   };
-
-  // Navigate to beats page when 'Explore More' is clicked
   const homePage = () => {
     navigate('/beats')
   }
