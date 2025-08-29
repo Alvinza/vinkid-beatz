@@ -4,15 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const AdminLogin = () => {
-  // Form state
+  // Form , Error & loading state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  // Error & loading state
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Error & loading state
   const { login } = useContext(UserContext);
   const navigate = useNavigate();
 
