@@ -6,7 +6,6 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   // Initialize user state from localStorage if available
   const [user, setUser] = useState(() => {
-    // Retrieve saved user data from browser's local storage
     const savedUser = localStorage.getItem('user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
@@ -58,7 +57,6 @@ export const UserProvider = ({ children }) => {
 export const useUser = () => {
   const context = React.useContext(UserContext);
   if (!context) {
-    // Ensure hook is used within UserProvider
     throw new Error('useUser must be used within a UserProvider');
   }
   return context;
