@@ -35,8 +35,6 @@ function App() {
           <AudioProvider>
             {/* Toast notification container for displaying alerts */}
             <ToastContainer />
-
-            {/* navigation component */}
             <CustomNavbar />
 
             {/* Define application routing */}
@@ -54,9 +52,6 @@ function App() {
               <Route path="/success" element={<Success />} />
               {/* Catch-all route for undefined pages */}
               <Route path="*" element={<NotFound />} />
-
-              {/* Admin-specific routes */}
-              // <Route path="/admin-login" element={<AdminLogin />} />
               <Route
                 path="/admin-panel"
                 element={
