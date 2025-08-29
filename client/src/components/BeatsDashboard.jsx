@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-
+/**
+ * Admin dashboard for managing beats.
+ * - Fetches beats from backend on mount
+ * - Allows editing beat details (title, bpm, price, genre)
+ * - Supports deleting beats
+ * - Uses token-based authentication for secure update/delete actions
+ */
 const BeatsDashboard = () => {
   const [beats, setBeats] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -46,8 +52,8 @@ const BeatsDashboard = () => {
       });
       
       if (response.ok) {
-        setEditingId(null);
-        fetchBeats();
+        setEditingId(null); // Exit edit mode
+        fetchBeats(); // Refresh updated beats list
       } else {
         const error = await response.json();
         alert(error.message || 'Failed to update beat');
@@ -58,6 +64,7 @@ const BeatsDashboard = () => {
     }
   };
 
+  // Delete a beat from backend (after confirmation)
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this beat?')) {
       try {
@@ -70,7 +77,7 @@ const BeatsDashboard = () => {
         });
         
         if (response.ok) {
-          fetchBeats();
+          fetchBeats(); // Refresh updated beats list
         } else {
           const error = await response.json();
           alert(error.message || 'Failed to delete beat');
@@ -89,8 +96,8 @@ const BeatsDashboard = () => {
         {beats.map((beat) => (
           <div key={beat._id} className="border rounded-lg p-3 bg-white shadow">
             {editingId === beat._id ? (
-              // Edit Form
               <div className="space-y-2">
+                {/* title field */}
                 <div>
                   <input
                     type="text"
@@ -100,6 +107,7 @@ const BeatsDashboard = () => {
                     className="w-full p-1 text-sm border rounded"
                   />
                 </div>
+                {/* bpm field */}
                 <div>
                   <input
                     type="number"
@@ -109,6 +117,7 @@ const BeatsDashboard = () => {
                     className="w-full p-1 text-sm border rounded"
                   />
                 </div>
+                {/* Price field */}
                 <div>
                   <input
                     type="number"
@@ -119,6 +128,7 @@ const BeatsDashboard = () => {
                     className="w-full p-1 text-sm border rounded"
                   />
                 </div>
+                {/* genre field */}
                 <div>
                   <input
                     type="text"
@@ -128,6 +138,7 @@ const BeatsDashboard = () => {
                     className="w-full p-1 text-sm border rounded"
                   />
                 </div>
+                {/* Action buttons */}
                 <div className="flex gap-2">
                   <button 
                     onClick={() => handleUpdate(beat._id)}
@@ -160,10 +171,13 @@ const BeatsDashboard = () => {
                     <p>BPM: {beat.bpm}</p>
                     <p>Price: ${beat.price}</p>
                   </div>
+                  
+                  {/* Beat Preview (audio player) */}
                   <audio controls className="w-full mt-1 h-8">
                     <source src={beat.audio} type="audio/mpeg" /> {/* Direct Cloudinary URL */}
                     Your browser does not support the audio element.
                   </audio>
+                  {/* Action buttons */}
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(beat)}
