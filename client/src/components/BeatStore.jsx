@@ -1,3 +1,4 @@
+// Displays beats from backend, allows filtering, sorting, search, play/pause, and adding to cart
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -153,7 +154,6 @@ function BeatStore() {
   };
 
   return (
- 
     <motion.div
       initial={{ opacity: 0, y: 100 }}
       transition={{ duration: 2 }}
