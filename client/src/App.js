@@ -6,7 +6,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Route, Routes } from 'react-router-dom';
 
-// Import custom components and context providers
+//  custom components and context providers
 import CustomNavbar from './components/CustomNavbar';
 import Contact from './components/Contact';
 import BeatStore from './components/BeatStore';
@@ -24,7 +24,7 @@ import CartPage from './components/CartPage';
 import Success from './components/Success';
 import NotFound from './components/NotFound';
 import AdminPanel from './components/AdminPanel';
-import AdminLogin from './components/AdminLogin'; 
+// import AdminLogin from './components/AdminLogin'; 
 
 function App() {
   return (
@@ -57,7 +57,7 @@ function App() {
               <Route path="*" element={<NotFound />} />
 
               {/* Admin-specific routes */}
-              <Route path="/admin-login" element={<AdminLogin />} />
+              // <Route path="/admin-login" element={<AdminLogin />} />
               <Route
                 path="/admin-panel"
                 element={
