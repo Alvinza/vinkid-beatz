@@ -8,7 +8,6 @@ This application is a modern and user-friendly beat/music store built using the 
 ---
 ## 📸 Screenshots
 
-### Home Page
 ![App Screenshot](./client/src/assets/screenshot.png)
 
 ---
