@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 /**
  * Admin dashboard for managing beats.
  * - Fetches beats from backend on mount
@@ -18,17 +18,19 @@ const BeatsDashboard = () => {
 
   // Retrieve stored authentication token for API requests
   const getAuthToken = () => {
-    return localStorage.getItem('token');
+    return localStorage.getItem("token");
   };
 
   // Fetch all beats from backend
   const fetchBeats = async () => {
     try {
-      const response = await fetch('https://vinkid-beatz-backend.onrender.com/api/beats');
+      const response = await fetch(
+        "https://vinkid-beatz-backend.onrender.com/api/beats"
+      );
       const data = await response.json();
       setBeats(data);
     } catch (error) {
-      console.error('Error fetching beats:', error);
+      console.error("Error fetching beats:", error);
     }
   };
 
@@ -38,60 +40,68 @@ const BeatsDashboard = () => {
     setEditForm({ ...beat });
   };
 
-   // Save updated beat details to backend
+  // Save updated beat details to backend
   const handleUpdate = async (id) => {
     try {
       const token = getAuthToken();
-      const response = await fetch(`https://vinkid-beatz-backend.onrender.com/api/beats/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(editForm),
-      });
-      
+      const response = await fetch(
+        `https://vinkid-beatz-backend.onrender.com/api/beats/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(editForm),
+        }
+      );
+
       if (response.ok) {
         setEditingId(null); // Exit edit mode
         fetchBeats(); // Refresh updated beats list
       } else {
         const error = await response.json();
-        alert(error.message || 'Failed to update beat');
+        alert(error.message || "Failed to update beat");
       }
     } catch (error) {
-      console.error('Error updating beat:', error);
-      alert('Failed to update beat');
+      console.error("Error updating beat:", error);
+      alert("Failed to update beat");
     }
   };
 
   // Delete a beat from backend (after confirmation)
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this beat?')) {
+    if (window.confirm("Are you sure you want to delete this beat?")) {
       try {
         const token = getAuthToken();
-        const response = await fetch(`https://vinkid-beatz-backend.onrender.com/api/beats/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
+        const response = await fetch(
+          `https://vinkid-beatz-backend.onrender.com/api/beats/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
-        
+        );
+
         if (response.ok) {
           fetchBeats(); // Refresh updated beats list
         } else {
           const error = await response.json();
-          alert(error.message || 'Failed to delete beat');
+          alert(error.message || "Failed to delete beat");
         }
       } catch (error) {
-        console.error('Error deleting beat:', error);
-        alert('Failed to delete beat');
+        console.error("Error deleting beat:", error);
+        alert("Failed to delete beat");
       }
     }
   };
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4 text-amber-100">Beats Management</h1>
+      <h1 className="text-2xl font-bold mb-4 text-amber-100">
+        Beats Management
+      </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         {beats.map((beat) => (
           <div key={beat._id} className="border rounded-lg p-3 bg-white shadow">
@@ -102,7 +112,9 @@ const BeatsDashboard = () => {
                   <input
                     type="text"
                     value={editForm.title}
-                    onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, title: e.target.value })
+                    }
                     placeholder="Title"
                     className="w-full p-1 text-sm border rounded"
                   />
@@ -112,7 +124,9 @@ const BeatsDashboard = () => {
                   <input
                     type="number"
                     value={editForm.bpm}
-                    onChange={(e) => setEditForm({ ...editForm, bpm: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, bpm: Number(e.target.value) })
+                    }
                     placeholder="BPM"
                     className="w-full p-1 text-sm border rounded"
                   />
@@ -123,7 +137,12 @@ const BeatsDashboard = () => {
                     type="number"
                     step="0.01"
                     value={editForm.price}
-                    onChange={(e) => setEditForm({ ...editForm, price: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setEditForm({
+                        ...editForm,
+                        price: Number(e.target.value),
+                      })
+                    }
                     placeholder="Price"
                     className="w-full p-1 text-sm border rounded"
                   />
@@ -133,20 +152,22 @@ const BeatsDashboard = () => {
                   <input
                     type="text"
                     value={editForm.genre}
-                    onChange={(e) => setEditForm({ ...editForm, genre: e.target.value })}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, genre: e.target.value })
+                    }
                     placeholder="Genre"
                     className="w-full p-1 text-sm border rounded"
                   />
                 </div>
                 {/* Action buttons */}
                 <div className="flex gap-2">
-                  <button 
+                  <button
                     onClick={() => handleUpdate(beat._id)}
                     className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
                   >
                     Save
                   </button>
-                  <button 
+                  <button
                     onClick={() => setEditingId(null)}
                     className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
                   >
@@ -171,10 +192,11 @@ const BeatsDashboard = () => {
                     <p>BPM: {beat.bpm}</p>
                     <p>Price: ${beat.price}</p>
                   </div>
-                  
+
                   {/* Beat Preview (audio player) */}
                   <audio controls className="w-full mt-1 h-8">
-                    <source src={beat.audio} type="audio/mpeg" /> {/* Direct Cloudinary URL */}
+                    <source src={beat.audio} type="audio/mpeg" />{" "}
+                    {/* Direct Cloudinary URL */}
                     Your browser does not support the audio element.
                   </audio>
                   {/* Action buttons */}
