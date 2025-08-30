@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { UserContext } from "./UserContext"; // Import user context for authentication
+import { UserContext } from "../context/UserContext"; // Import user context for authentication
 
 // Higher-order component to protect admin routes
 const AdminRoute = ({ children }) => {
