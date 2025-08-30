@@ -1,29 +1,29 @@
-import React from 'react';
-import './App.css';
-import './index.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { Route, Routes } from 'react-router-dom';
+import React from "react";
+import "./App.css";
+import "./index.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Route, Routes } from "react-router-dom";
 
 //  custom components and context providers
-import CustomNavbar from './components/CustomNavbar';
-import Contact from './components/Contact';
-import BeatStore from './components/BeatStore';
-import About from './components/About';
-import Home from './components/Home';
-import Login from './components/Login';
-import Register from './components/Register';
-import Faq from './components/Faq';
-import { CartProvider } from './components/CartContext';
-import { AudioProvider } from './components/AudioContext';
-import { UserProvider } from './components/UserContext';
-import AdminRoute from './components/AdminRoute';
-import Payment from './components/Payment';
-import CartPage from './components/CartPage';
-import Success from './components/Success';
-import NotFound from './components/NotFound';
-import AdminPanel from './components/AdminPanel';
+import CustomNavbar from "./components/CustomNavbar";
+import Contact from "./components/Contact";
+import BeatStore from "./components/BeatStore";
+import About from "./components/About";
+import Home from "./components/Home";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import Faq from "./components/Faq";
+import { CartProvider } from "./context/CartContext";
+import { AudioProvider } from "./context/AudioContext";
+import { UserProvider } from "./context/UserContext";
+import AdminRoute from "./components/AdminRoute";
+import Payment from "./components/Payment";
+import CartPage from "./components/CartPage";
+import Success from "./components/Success";
+import NotFound from "./components/NotFound";
+import AdminPanel from "./components/AdminPanel";
 
 function App() {
   return (
@@ -51,7 +51,7 @@ function App() {
               <Route path="/success" element={<Success />} />
               {/* Catch-all route for undefined pages */}
               <Route path="*" element={<NotFound />} />
-                
+
               <Route
                 path="/admin-panel"
                 element={

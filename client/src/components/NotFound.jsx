@@ -2,10 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const NotFound = () => {
-    // Initialize navigation hook
     const navigate = useNavigate();
 
-    // Function to navigate back to home page
     const homePage = () => {
         navigate("/");
     };

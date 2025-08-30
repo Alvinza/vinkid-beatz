@@ -6,7 +6,7 @@
  */
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from './CartContext'; // Import cart context hook
+import { useCart } from "../context/CartContext"; // Import cart context hook
 
 function CartPage() {
   const { cart, removeFromCart, clearCart } = useCart();
@@ -16,7 +16,7 @@ function CartPage() {
   const totalPrice = cart.reduce((sum, item) => sum + item.price, 0);
 
   const handleBuy = () => {
-    navigate('/payment');
+    navigate("/payment");
   };
 
   return (
@@ -26,8 +26,8 @@ function CartPage() {
       {cart.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-xl text-gray-600">Your cart is empty!</p>
-          <button 
-            onClick={() => navigate('/beats')}
+          <button
+            onClick={() => navigate("/beats")}
             className="mt-4 btn btn btn-primary"
           >
             Browse Beats
@@ -38,7 +38,7 @@ function CartPage() {
           {/* List cart items */}
           <div className="space-y-4">
             {cart.map((item) => (
-              <div 
+              <div
                 key={item._id}
                 className="flex items-center justify-between bg-white p-4 rounded-lg shadow max-w-3xl"
               >
@@ -65,25 +65,21 @@ function CartPage() {
             ))}
           </div>
 
-           {/* Total price & actions */}
+          {/* Total price & actions */}
           <div className="mt-8 border-t pt-4">
             <div className="flex justify-between items-center mb-4">
               <span className="text-xl font-semibold">Total:</span>
-              <span className="text-2xl font-bold text-blue-600">${totalPrice.toFixed(2)}</span>
+              <span className="text-2xl font-bold text-blue-600">
+                ${totalPrice.toFixed(2)}
+              </span>
             </div>
-            
+
             <div className="flex space-x-4 justify-end">
               {/* Clear all items */}
-              <button
-                onClick={clearCart}
-                className="btn btn-outline-primary"
-              >
+              <button onClick={clearCart} className="btn btn-outline-primary">
                 Clear Cart
               </button>
-              <button
-                onClick={handleBuy}
-                className="btn btn-primary ml-2"
-              >
+              <button onClick={handleBuy} className="btn btn-primary ml-2">
                 Proceed to Buy
               </button>
             </div>

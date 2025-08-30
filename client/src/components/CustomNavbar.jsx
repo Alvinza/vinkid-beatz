@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar, Nav, Button, Container } from "react-bootstrap";
-import { UserContext } from "./UserContext";
+import { UserContext } from "../context/UserContext";
 import { FaShoppingCart, FaSearch } from "react-icons/fa";
 import SearchOverlay from "./SearchOverlay";
 import logo from "../assets/logo.png";
@@ -105,7 +105,7 @@ const CustomNavbar = () => {
                 >
                   Contact
                 </Nav.Link>
-                
+
                 {/* Only visible to admin users */}
                 {user && isAdmin && (
                   <Nav.Link

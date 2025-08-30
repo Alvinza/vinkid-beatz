@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 // Genre selector component for filtering beats
 const GenreSelector = ({ selectedGenre, setSelectedGenre }) => {
   // Predefined list of music genres
@@ -21,8 +21,8 @@ const GenreSelector = ({ selectedGenre, setSelectedGenre }) => {
           key={genre}
           // Conditional styling based on selected genre
           className={`px-4 py-2 rounded-md text-sm md:text-base transition-all duration-300 ${
-            selectedGenre === genre 
-              ? "bg-blue-600 text-white" 
+            selectedGenre === genre
+              ? "bg-blue-600 text-white"
               : "bg-blue-100 hover:bg-blue-200 text-blue-800"
           }`}
           // Update selected genre on click

@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import React, { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function BeatUploadForm() {
   // Form field states
   const [formData, setFormData] = useState({
-    title: '',
-    bpm: '',
-    price: '',
-    genre: '',
+    title: "",
+    bpm: "",
+    price: "",
+    genre: "",
   });
   // File states for picture and audio
   const [files, setFiles] = useState({ picture: null, audio: null });
   // Upload loading and progress states
   const [loading, setLoading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState({ picture: 0, audio: 0 });
+  const [uploadProgress, setUploadProgress] = useState({
+    picture: 0,
+    audio: 0,
+  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,24 +29,24 @@ function BeatUploadForm() {
     if (file) {
       // Validate file size (20MB limit)
       if (file.size > 20 * 1024 * 1024) {
-        toast.error('File size must be less than 20MB');
-        e.target.value = '';
+        toast.error("File size must be less than 20MB");
+        e.target.value = "";
         return;
       }
-      
+
       // Validate image types
-      if (e.target.name === 'picture' && !file.type.startsWith('image/')) {
-        toast.error('Please select a valid image file');
-        e.target.value = '';
+      if (e.target.name === "picture" && !file.type.startsWith("image/")) {
+        toast.error("Please select a valid image file");
+        e.target.value = "";
         return;
       }
       // Validate audio type
-      if (e.target.name === 'audio' && !file.type.startsWith('audio/')) {
-        toast.error('Please select a valid audio file');
-        e.target.value = '';
+      if (e.target.name === "audio" && !file.type.startsWith("audio/")) {
+        toast.error("Please select a valid audio file");
+        e.target.value = "";
         return;
       }
-      
+
       setFiles({ ...files, [e.target.name]: file });
     }
   };
@@ -51,25 +54,29 @@ function BeatUploadForm() {
   // Upload file to Cloudinary and return the URL
   const uploadToCloudinary = async (file, type) => {
     const data = new FormData();
-    data.append('file', file);
-    data.append('upload_preset', 'beats_upload');
-    
+    data.append("file", file);
+    data.append("upload_preset", "beats_upload");
+
     try {
       const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/dxqqv0srw/${type === 'picture' ? 'image' : 'video'}/upload`,
+        `https://api.cloudinary.com/v1_1/dxqqv0srw/${
+          type === "picture" ? "image" : "video"
+        }/upload`,
         data,
         {
           onUploadProgress: (progressEvent) => {
-            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadProgress(prev => ({ ...prev, [type]: progress }));
-          }
+            const progress = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setUploadProgress((prev) => ({ ...prev, [type]: progress }));
+          },
         }
       );
-      
+
       if (!response.data || !response.data.secure_url) {
         throw new Error(`Failed to get upload URL for ${type}`);
       }
-      
+
       return response.data.secure_url;
     } catch (error) {
       console.error(`Error uploading ${type}:`, error);
@@ -84,54 +91,53 @@ function BeatUploadForm() {
 
     try {
       if (!files.picture || !files.audio) {
-        throw new Error('Both picture and audio files are required');
+        throw new Error("Both picture and audio files are required");
       }
 
       // Upload files to Cloudinary
       const [pictureUrl, audioUrl] = await Promise.all([
-        uploadToCloudinary(files.picture, 'picture'),
-        uploadToCloudinary(files.audio, 'audio')
+        uploadToCloudinary(files.picture, "picture"),
+        uploadToCloudinary(files.audio, "audio"),
       ]);
 
       // Prepare beat data
       const beatData = {
         ...formData,
         picture: pictureUrl,
-        audio: audioUrl
+        audio: audioUrl,
       };
       // Send beat data to backend
       const response = await axios.post(
-        'https://vinkid-beatz-backend.onrender.com/api/upload-beat',
+        "https://vinkid-beatz-backend.onrender.com/api/upload-beat",
         beatData,
         {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          }
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
         }
       );
 
-      toast.success('Beat uploaded successfully!');
-      
+      toast.success("Beat uploaded successfully!");
+
       // Reset form
       setFormData({
-        title: '',
-        bpm: '',
-        price: '',
-        genre: '',
+        title: "",
+        bpm: "",
+        price: "",
+        genre: "",
       });
       setFiles({ picture: null, audio: null });
       setUploadProgress({ picture: 0, audio: 0 });
-      
+
       // Reset file inputs
       const fileInputs = document.querySelectorAll('input[type="file"]');
-      fileInputs.forEach(input => {
-        input.value = '';
+      fileInputs.forEach((input) => {
+        input.value = "";
       });
-
     } catch (err) {
-      console.error('Upload error:', err);
-      toast.error(err.message || 'Failed to upload beat');
+      console.error("Upload error:", err);
+      toast.error(err.message || "Failed to upload beat");
     } finally {
       setLoading(false);
     }
@@ -196,11 +202,12 @@ function BeatUploadForm() {
               className="w-full p-3 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          
+
           <div className="form-group">
             {/* picture input field */}
             <label className="block text-white mb-2">
-              Cover Image {uploadProgress.picture > 0 && `(${uploadProgress.picture}%)`}
+              Cover Image{" "}
+              {uploadProgress.picture > 0 && `(${uploadProgress.picture}%)`}
             </label>
             <input
               type="file"
@@ -211,11 +218,12 @@ function BeatUploadForm() {
               className="w-full p-3 rounded-lg bg-gray-700 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
           </div>
-          
+
           <div className="form-group">
             {/* audio/ beat input field */}
             <label className="block text-white mb-2">
-              Audio File {uploadProgress.audio > 0 && `(${uploadProgress.audio}%)`}
+              Audio File{" "}
+              {uploadProgress.audio > 0 && `(${uploadProgress.audio}%)`}
             </label>
             <input
               type="file"
@@ -227,12 +235,12 @@ function BeatUploadForm() {
             />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
             className="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            {loading ? 'Uploading...' : 'Upload Beat'}
+            {loading ? "Uploading..." : "Upload Beat"}
           </button>
         </form>
       </div>
