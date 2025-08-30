@@ -11,7 +11,7 @@ import {
   SkipForward,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { useCart } from "./CartContext";
+import { useCart } from '../context/CartContext';
 import { toast } from "react-toastify";
 import GenreSelector from './GenreSelector';
 
