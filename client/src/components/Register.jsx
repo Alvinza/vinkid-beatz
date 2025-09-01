@@ -34,22 +34,14 @@ const Register = () => {
     try {
       // Send POST request to registration API endpoint
       await axios.post("https://vinkid-beatz-backend.onrender.com/api/register", values);
-      
-      // Navigate to login page after successful registration
       navigate("/login");
-      
-      // Show success toast notification
       toast.success("Registration successful. Please log in.");
-      
       // Reset form fields
       resetForm();
     } catch (error) {
-      // Log and display error if registration fails
       console.error("Registration error:", error);
       toast.error(error.response?.data?.error || "Registration failed");
     }
-    
-    // Set submitting state to false
     setSubmitting(false);
   };
 
