@@ -6,7 +6,7 @@ This application is a modern and user-friendly beat/music store built using the 
 📧 **Contact Me**: alvinzondi09@gmail.com  
 
 ---
-## 📸 Screenshots
+## 📸 Screenshot
 
 ![App Screenshot](./client/src/assets/screenshot.png)
 
