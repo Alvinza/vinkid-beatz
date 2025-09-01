@@ -76,5 +76,4 @@ Building this Beat Store came with several challenges:
 These challenges taught me how to debug effectively, read documentation carefully, and design smooth full-stack features.  
 
 ---
-
 ✅ Thank you for checking out my project!  
