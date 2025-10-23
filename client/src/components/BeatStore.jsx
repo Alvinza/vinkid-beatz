@@ -14,6 +14,7 @@ import { motion } from "motion/react";
 import { useCart } from '../context/CartContext';
 import { toast } from "react-toastify";
 import GenreSelector from './GenreSelector';
+import Spinner from 'react-bootstrap/Spinner';
 
 function BeatStore() {
   // State management for various features
@@ -203,7 +204,7 @@ function BeatStore() {
                 No beats found
               </h2>
               <p className="text-gray-500 mt-2">
-                Loading, please wait a moment.. or try adjusting your search
+                <Spinner animation="grow" /> please wait a moment.. or try adjusting your search
               </p>
             </div>
           ) : (
