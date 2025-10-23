@@ -204,7 +204,7 @@ function BeatStore() {
                 No beats found
               </h2>
               <p className="text-gray-500 mt-2">
-                <Spinner animation="grow" /> please wait a moment.. or try adjusting your search
+                <Spinner animation="grow" size="sm"/> please wait a moment.. or try adjusting your search
               </p>
             </div>
           ) : (
