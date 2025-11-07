@@ -40,13 +40,13 @@ function CartPage() {
             {cart.map((item) => (
               <div
                 key={item._id}
-                className="flex items-center justify-between bg-white p-4 rounded-lg shadow max-w-3xl"
+                className="flex items-center justify-between bg-white p-4 rounded-lg shadow hover:shadow-lg transition-all duration-300 max-w-3xl"
               >
                 <div className="flex items-center space-x-4">
                   <img
                     src={item.picture}
                     alt={item.title}
-                    className="w-20 h-20 object-cover rounded"
+                    className="w-20 h-20 object-cover rounded-lg ring-1 ring-gray-200"
                   />
                   <div>
                     <h3 className="font-semibold text-lg">{item.title}</h3>
