@@ -25,7 +25,7 @@ function CartPage() {
       {/* Show empty cart message */}
       {cart.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-xl text-gray-600">Your cart is empty!</p>
+          <p className="text-xl text-gray-600">🛒Your cart is empty!</p>
           <button
             onClick={() => navigate("/beats")}
             className="mt-4 btn btn btn-primary"
