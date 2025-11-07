@@ -52,7 +52,7 @@ const Register = () => {
 
   return (
     // registration form responsive design
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 mt-10">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 mt-20">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
         <div className="flex justify-center mb-6">
           <img
