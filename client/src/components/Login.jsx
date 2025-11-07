@@ -94,7 +94,7 @@ const Login = () => {
       <div className="w-full max-w-md transform transition-all duration-300 hover:shadow-xl">
         <div className="bg-white rounded-2xl shadow-lg p-8 md:p-10">
           <div className="flex justify-center mb-6">
-            <img className="w-10 h-10 object-cover opacity-80" src={blackLogo} alt="vinkid logo" />
+            <img className="w-8 h-8 object-cover opacity-80" src={blackLogo} alt="vinkid logo" />
           </div>
           {/* Page title */}
           <div className="flex justify-center mb-8">
