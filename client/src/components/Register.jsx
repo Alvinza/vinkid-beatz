@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
+import blackLogo from '../assets/blackLogo.png';
 
 const Register = () => {
   // Initial form values for registration
@@ -53,6 +54,14 @@ const Register = () => {
     // registration form responsive design
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
+        <div className="flex justify-center mb-6">
+          <img
+            src={blackLogo}
+            alt="Vinkid Logo"
+            className="w-8 h-8 object-contain"
+          />
+        </div>
+
         <h2 className="text-2xl font-bold text-center mb-6">Sign up</h2>
 
         {/* Formik form for handling registration with validation */}
