@@ -21,7 +21,7 @@ function CartPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
+      <h2 className="text-3xl font-bold mb-6">Your Cart</h2>
       {/* Show empty cart message */}
       {cart.length === 0 ? (
         <div className="text-center py-8">
