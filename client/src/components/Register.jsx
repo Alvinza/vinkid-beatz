@@ -4,6 +4,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
 
 const Register = () => {
   // Initial form values for registration
@@ -33,7 +34,10 @@ const Register = () => {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       // Send POST request to registration API endpoint
-      await axios.post("https://vinkid-beatz-backend.onrender.com/api/register", values);
+      await axios.post(
+        "https://vinkid-beatz-backend.onrender.com/api/register",
+        values
+      );
       navigate("/login");
       toast.success("Registration successful. Please log in.");
       // Reset form fields
@@ -50,7 +54,7 @@ const Register = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
         <h2 className="text-2xl font-bold text-center mb-6">Register</h2>
-        
+
         {/* Formik form for handling registration with validation */}
         <Formik
           initialValues={initialValues}
@@ -64,12 +68,16 @@ const Register = () => {
                 <label className="block text-gray-700" htmlFor="username">
                   Username
                 </label>
-                <Field
-                  type="text"
-                  id="username"
-                  name="username"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
-                />
+                <div className="relative">
+                  <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Field
+                    type="text"
+                    id="username"
+                    name="username"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
+                    placeholder="Enter your username"
+                  />
+                </div>
                 {/* Display validation error for username */}
                 <ErrorMessage
                   name="username"
@@ -83,12 +91,17 @@ const Register = () => {
                 <label className="block text-gray-700" htmlFor="email">
                   Email
                 </label>
-                <Field
-                  type="email"
-                  id="email"
-                  name="email"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
-                />
+                <div className="relative">
+                  <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Field
+                    type="email"
+                    id="email"
+                    name="email"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
+                    placeholder="Enter your email"
+                  />
+                </div>
+
                 {/* Display validation error for email */}
                 <ErrorMessage
                   name="email"
@@ -102,12 +115,17 @@ const Register = () => {
                 <label className="block text-gray-700" htmlFor="password">
                   Password
                 </label>
-                <Field
-                  type="password"
-                  id="password"
-                  name="password"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
-                />
+                <div className="relative">
+                  <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Field
+                    type="password"
+                    id="password"
+                    name="password"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
+                    placeholder="Enter your password"
+                  />
+                </div>
+
                 {/* Display validation error for password */}
                 <ErrorMessage
                   name="password"
@@ -118,15 +136,23 @@ const Register = () => {
 
               {/* Confirm Password input field */}
               <div className="mb-4">
-                <label className="block text-gray-700" htmlFor="confirmPassword">
+                <label
+                  className="block text-gray-700"
+                  htmlFor="confirmPassword"
+                >
                   Confirm Password
                 </label>
-                <Field
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
-                />
+                <div className="relative">
+                  <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Field
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
+                    placeholder="Confirm your password"
+                  />
+                </div>
+
                 {/* Display validation error for confirm password */}
                 <ErrorMessage
                   name="confirmPassword"
