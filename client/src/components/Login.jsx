@@ -5,6 +5,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
+import { FaEnvelope, FaLock } from "react-icons/fa";
+
 
 const Login = () => {
   // Access login context and navigation hook
@@ -113,13 +115,17 @@ const Login = () => {
                   >
                     Email Address
                   </label>
-                  <Field
-                    type="email"
-                    id="email"
-                    name="email"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ease-in-out"
-                    placeholder="Enter your email"
-                  />
+                  <div className="relative">
+                    <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Field
+                      type="email"
+                      id="email"
+                      name="email"
+                      className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ease-in-out"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+
                   {/* Display validation error for email */}
                   <ErrorMessage
                     name="email"
@@ -136,13 +142,17 @@ const Login = () => {
                   >
                     Password
                   </label>
-                  <Field
-                    type="password"
-                    id="password"
-                    name="password"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ease-in-out"
-                    placeholder="Enter your password"
-                  />
+                  <div className="relative">
+                    <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Field
+                      type="password"
+                      id="password"
+                      name="password"
+                      className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ease-in-out"
+                      placeholder="Enter your password"
+                    />
+                  </div>
+
                   {/* Display validation error for password */}
                   <ErrorMessage
                     name="password"
