@@ -25,7 +25,7 @@ const YoutubePlayer = () => {
   }, []);
 
   return (
-    <div className="max-w-xl mx-auto mt-6 p-4 rounded-lg shadow-lg bg-white">
+    <div className="max-w-xl mx-auto mt-6 p-4 rounded-lg ">
       <div className="w-full h-[350px] mb-4">
         <iframe
           className="w-full h-full rounded-lg"
