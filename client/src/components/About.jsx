@@ -8,6 +8,7 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import pic from "../assets/pic1.jpg";
 import { motion } from "motion/react"; // library for animation
+import YoutubePlayer from './YoutubePlayer';
 
 const About = () => {
   return (
@@ -78,6 +79,7 @@ const About = () => {
           </a>
         </div>
       </div>
+      <YoutubePlayer />
     </motion.div>
   );
 };
