@@ -26,6 +26,13 @@ const YoutubePlayer = () => {
 
   return (
     <div className="max-w-xl mx-auto mt-6 p-4 rounded-lg ">
+      {isLoading && (
+        <p className="text-gray-600 text-center">Loading Video...</p>
+      )}
+
+      {error && (
+        <p className="text-red-500 text-center font-medium">{error}</p>
+      )}
       <div className="w-full h-[350px] mb-4">
         <iframe
           className="w-full h-full rounded-lg"
@@ -35,14 +42,6 @@ const YoutubePlayer = () => {
           allowFullScreen
         ></iframe>
       </div>
-
-      {isLoading && (
-        <p className="text-gray-600 text-center">Loading Video...</p>
-      )}
-
-      {error && (
-        <p className="text-red-500 text-center font-medium">{error}</p>
-      )}
     </div>
   );
 };
