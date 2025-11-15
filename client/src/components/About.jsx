@@ -27,7 +27,7 @@ const About = () => {
         {/* Profile picture with responsive sizing */}
         <img
           src={pic}
-          alt="Vinkid Beatz"
+          alt="Vinkid profile picture"
           loading="lazy"
           className="rounded-full w-40 h-40 sm:w-56 sm:h-56 mb-4 mx-auto object-cover"
         />
