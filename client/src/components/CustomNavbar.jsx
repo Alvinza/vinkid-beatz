@@ -177,6 +177,7 @@ const CustomNavbar = () => {
       </div>
 
       {/* Search overlay component */}
+      {/* Allows to pop the search component */}
       <SearchOverlay
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
