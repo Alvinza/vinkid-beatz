@@ -5,40 +5,36 @@ import { motion } from "motion/react"; // motion for animation
 
 const Contact = () => {
   const [result, setResult] = React.useState(""); // manage form submission result
+  const [loading, setLoading] = React.useState(false);
 
   // Handle form submission
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    setResult("Sending....");
+   const onSubmit = async (event) => {
+  event.preventDefault();
+  setResult("Sending....");
+  setLoading(true);
 
-    // Create form data
-    const formData = new FormData(event.target);
-    // access key for Web3Forms
-    formData.append("access_key", "ac0ea1e3-87c3-4016-8df4-9f62d0403230");
+  const formData = new FormData(event.target);
+  formData.append("access_key", "ac0ea1e3-87c3-4016-8df4-9f62d0403230");
 
-    // Submit form data to Web3Forms
-    const response = await fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      body: formData,
-    });
+  const response = await fetch("https://api.web3forms.com/submit", {
+    method: "POST",
+    body: formData,
+  });
 
-    // Parse response
-    const data = await response.json();
+  const data = await response.json();
 
-    // Handle successful submission
-    if (data.success) {
-      setResult("");
-      toast.success("Email submitted successfully");
-      event.target.reset();
-    }
-    // Handle submission error
-    else {
-      console.log("Error", data);
-      setResult(data.message);
-      toast.error(data.message);
-      setResult("");
-    }
-  };
+  if (data.success) {
+    setResult("");
+    toast.success("Email submitted successfully");
+    event.target.reset();
+  } else {
+    console.log("Error", data);
+    setResult(data.message);
+    toast.error(data.message);
+    setResult("");
+  }
+  setLoading(false);
+};
 
   return (
     // Animated contact section with motion
@@ -107,10 +103,30 @@ const Contact = () => {
           ></textarea>
         </div>
 
-        {/* Submit button */}
-        <div className="contact-button">
-          <button>{result ? result : "Send Message"}</button>
-        </div>
+             {/* Animated shimmer submit button */}
+<div className="contact-button relative inline-block mt-2">
+  <motion.button
+    type="submit"
+    disabled={loading}
+    whileHover={{ scale: loading ? 1 : 1.05 }}
+    whileTap={{ scale: loading ? 1 : 0.97 }}
+    transition={{ type: "spring", stiffness: 300, damping: 15 }}
+    className={`relative overflow-hidden rounded-lg px-8 py-3 font-medium text-white shadow-lg
+      bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600
+      ${loading ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
+  >
+    {/* Moving shimmer highlight */}
+    <motion.span
+      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+      initial={{ x: "-100%" }}
+      animate={{ x: "100%" }}
+      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+    />
+    <span className="relative z-10">
+      {loading ? "Sending..." : result ? result : "Send Message"}
+    </span>
+  </motion.button>
+ </div>
       </form>
     </motion.div>
   );
