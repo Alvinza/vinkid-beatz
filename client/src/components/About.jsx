@@ -24,13 +24,24 @@ const About = () => {
           Welcome to Vinkid Beatz!
         </h2>
         
-        {/* Profile picture with responsive sizing */}
-        <img
-          src={pic}
-          alt="Vinkid profile picture"
-          loading="lazy"
-          className="rounded-full w-40 h-40 sm:w-56 sm:h-56 mb-4 mx-auto object-cover"
-        />
+       {/* Profile picture with animated glow ring + hover effect */}
+<div className="relative w-40 h-40 sm:w-56 sm:h-56 mx-auto mb-4">
+  {/* Pulsing gradient glow ring */}
+  <motion.div
+    className="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-blue-500 blur-md"
+    animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0.9, 0.6] }}
+    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+  />
+  {/* Profile image with hover tilt */}
+  <motion.img
+    src={pic}
+    alt="Vinkid profile picture"
+    loading="lazy"
+    whileHover={{ scale: 1.05, rotate: 2 }}
+    transition={{ type: "spring", stiffness: 200, damping: 15 }}
+    className="relative rounded-full w-full h-full object-cover border-4 border-white shadow-xl"
+  />
+</div>
         
         {/* About section */}
         <div className="space-y-4 text-center px-4">
